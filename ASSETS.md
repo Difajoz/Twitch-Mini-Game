@@ -3,6 +3,7 @@
 | Asset | Source / author | License / use |
 | --- | --- | --- |
 | Runner character, rooftops, buildings, obstacles, tokens | Original procedural Three.js geometry authored in this project with Codex | Project source; no extracted game assets |
+| Pocket Enterprise businessman, shops, coin track, coins and gates | Original procedural Three.js geometry and generated text textures in this project | Project source; no Money Rush assets or code used |
 | Shelf illustration | Original CSS artwork authored in this project with Codex | Project source |
 | Interface icons | Inline SVG/CSS geometry in this project matching the reference controls | Project source |
 | Token and collision tones | Original Web Audio oscillators | Generated at runtime; no audio samples |

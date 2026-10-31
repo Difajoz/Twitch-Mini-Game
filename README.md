@@ -83,4 +83,14 @@ The normal game rail takes 35% of the content area (up from 28%, a 25% increase)
 
 Use **Stream + games fullscreen** immediately below the video, or **Watch + play fullscreen** above it, to fullscreen the entire app. Twitch's fullscreen control belongs to its cross-origin player and fullscreens only that player; it cannot include app content outside the embed.
 
-Skyline Sprint is playable. Neon Drift, Orbit Breaker, Pixel Rally, Moon Hopper, and Crystal Match are static presentation examples with in-game scenes, HUDs and control hints. They can be selected in the library but intentionally have no gameplay simulation. Their visual treatment has no Coming soon or Preview only labels, as requested for the demo.
+Skyline Sprint and Pocket Enterprise are playable. Neon Drift, Orbit Breaker, Pixel Rally, Moon Hopper, and Crystal Match are static presentation examples with in-game scenes, HUDs and control hints. They can be selected in the library but intentionally have no gameplay simulation. Their visual treatment has no Coming soon or Preview only labels, as requested for the demo.
+
+## Pocket Enterprise
+
+Choose Mini games → Pocket Enterprise. Start a 34-second coin run and choose arithmetic gates with A/D, left/right arrows, the visible steering buttons, or pointer drag in the game. Blue gates add/multiply; red gates subtract/divide. A new run begins with 20 free coins. Finish to bank the remaining coins plus a small shop-order bonus. Reaching zero ends the run without spending your saved wallet.
+
+In Businesses, open Coffee House (250), Cookie Corner (750), then Burger Club (1,800). Each has two upgrade tiers. Shop order bonuses are capped at 25% of the completed run's coins, so running stays the main source of earnings. There is no offline income or real-money currency.
+
+Coins spread into new formation slots, tumble off the track on losses, stack onto the businessman's hand at the finish, and stream from the hand to the selected business during purchases. Large values use representative visual coins while numeric balances remain exact. Purchases take approximately 0.8 seconds and can be left immediately; accounting does not depend on finishing an animation. The game is silent by design and honors reduced-motion preferences.
+
+Wallet and shop levels save in browser local storage separately from Skyline's best score. Modern browsers synchronize transactions through Web Locks. Storage failures show a session-only notice; unsupported Web Locks show a single-tab warning. In-progress runs stay in memory and are not recovered after reloading. Clicking the stream, leaving the tab, closing the rail or switching games pauses a running game; resume explicitly.

@@ -1,5 +1,15 @@
 # First playable build — October 31, 2026
 
+## Pocket Enterprise — second playable game
+
+Implemented a separate 34-second, six-gate coin runner with a saved business street. Two-lane movement supports arrows/A/D, visible buttons and pointer drag. Arithmetic gains/losses, pickups, one-time run settlement, three ordered shop unlocks, two upgrades per shop and capped order bonuses are working. State is separate from Skyline. Web Locks serialize profile transactions across supported browser tabs; failures and unsupported storage/locking show explicit notices.
+
+Original Three.js visuals include coin formation reflow and gate-sourced additions, falling/tumbling losses, sequential curved flights into short palm stacks, rapid coin payment into the chosen shop, staged shop growth, colored storefronts and distinct counter items. Representative coin counts keep rendering bounded. Transactions commit separately from visual counters. Payment runs for 0.8 seconds; animations freeze while the panel is hidden. No imported game assets, rainbow effects, sound or offline earnings.
+
+Verification: all 27 tests pass, including all 64 six-gate routes across four round arrangements, economy and invalid-save tests. Browser QA completed real runs for 155 and 230 coins, banked 385, bought Coffee House for 250 and verified the remaining 135 plus level-one shop after reload. App fullscreen preserved the run; a discovered canvas sizing issue on exit was fixed and rechecked (316px game/scene width and 316px scroll width inside a 338px rail). The latest reference Twitch channel was offline, so this change does not claim new live-video performance verification. Production build and TypeScript pass; longer human gameplay/performance feedback remains useful.
+
+The catalog now contains two playable games and five static concepts. The new game retains its session across library switches and rail close/reopen; only city progress, not active runs, persists through reload.
+
 Implemented in Codex chat `01a19028-1860-7ab2-a176-689914c0ff29`.
 
 ## Twitch-style redesign — October 31 follow-up

@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { Icon } from './Icons';
 
 const GamePanel = dynamic(() => import('./GamePanel'), { ssr: false, loading: () => <div className="game-loading">Loading Skyline Sprint…</div> });
+const EnterpriseGame = dynamic(() => import('./EnterpriseGame'), { ssr: false });
 const games = [
+  { id: 'enterprise', name: 'Pocket Enterprise', genre: 'Runner · Tycoon', description: 'Run for coins. Build your little empire.' },
   { id: 'skyline', name: 'Skyline Sprint', genre: '3D Runner', description: 'Dodge, jump, and chase the skyline.' },
   { id: 'neon', name: 'Neon Drift', genre: 'Racing', description: 'Find your line through the neon city.' },
   { id: 'orbit', name: 'Orbit Breaker', genre: 'Arcade', description: 'Clear the field. Keep the ball alive.' },
@@ -16,8 +18,9 @@ export type GameId = typeof games[number]['id'];
 type Props = { open: boolean; selected: GameId | null; best: number; muted: boolean; onSelect: (game: GameId) => void; onBest: (score: number) => void; onMute: () => void; onClose: () => void; onBack: () => void };
 
 export default function MiniGames({ open, selected, best, muted, onSelect, onBest, onMute, onClose, onBack }: Props) {
+  const [enterpriseMounted, setEnterpriseMounted] = useState(false);
   const [runnerMounted, setRunnerMounted] = useState(false);
-  const choose = (id: GameId) => { if (id === 'skyline') setRunnerMounted(true); onSelect(id); };
+  const choose = (id: GameId) => { if (id === 'enterprise') setEnterpriseMounted(true); if (id === 'skyline') setRunnerMounted(true); onSelect(id); };
   const game = games.find(game => game.id === selected);
   return <aside id="mini-games-sidebar" className={`mini-games-sidebar ${selected ? 'has-selection' : ''}`} hidden={!open} aria-label="Mini games sidebar">
     <header className="mini-games-header"><h2><Icon name="game" size={19} />Mini games</h2><button className="icon-button" aria-label="Close mini games" onClick={onClose}><Icon name="close" size={18} /></button></header>
@@ -25,13 +28,14 @@ export default function MiniGames({ open, selected, best, muted, onSelect, onBes
       <div className="selected-game-heading"><span>NOW PLAYING</span><button className="text-button" onClick={onBack}>All games</button></div>
       {/* Keep the real runner mounted and paused when switching games or closing the bar. */}
       <div className="runner-slot" hidden={selected !== 'skyline'}>{runnerMounted && <GamePanel open={open && selected === 'skyline'} best={best} muted={muted} onBest={onBest} onMute={onMute} onClose={onBack} />}</div>
-      {selected !== 'skyline' && game && <section className="example-game" aria-label={`${game.name} game`}>
+      <div className="runner-slot" hidden={selected !== 'enterprise'}>{enterpriseMounted && <EnterpriseGame open={open && selected === 'enterprise'} />}</div>
+      {selected !== 'skyline' && selected !== 'enterprise' && game && <section className="example-game" aria-label={`${game.name} game`}>
         <div className="game-topbar"><strong>{game.name}</strong><button className="icon-button" aria-label="Close game" onClick={onBack}>×</button></div>
         <div className="example-game-view"><GameScene game={game.id} /><div className="example-hud"><span>{selected === 'crystal' ? 'MOVES  18' : selected === 'orbit' ? 'LEVEL  03' : selected === 'moon' ? 'ALTITUDE  240 m' : 'LAP  2 / 3'}</span><strong>{selected === 'crystal' ? '2,450' : selected === 'orbit' ? '1,280' : selected === 'moon' ? '860' : '00:42.68'}</strong></div></div>
         <div className="example-game-controls"><span>{selected === 'crystal' ? 'Match 3 to collect' : selected === 'orbit' ? 'Move to aim' : selected === 'moon' ? '← → Move · Space Jump' : '← → Steer · ↑ Accelerate'}</span><span>♥ ♥ ♥</span></div>
       </section>}
     </div>
-    <section className="mini-games-library" aria-label="Choose a mini game"><div className="library-heading"><h3>{selected ? 'Switch game' : 'Pick a game'}</h3><span>6 games</span></div><div className="mini-games-list">
+    <section className="mini-games-library" aria-label="Choose a mini game"><div className="library-heading"><h3>{selected ? 'Switch game' : 'Pick a game'}</h3><span>{games.length} games</span></div><div className="mini-games-list">
       {games.map(game => <button key={game.id} className={`mini-game-card ${selected === game.id ? 'selected' : ''}`} onClick={() => choose(game.id)} aria-label={`Play ${game.name}`} aria-pressed={selected === game.id}>
         <span className="mini-game-cover"><GameScene game={game.id} /></span><span className="mini-game-copy"><strong>{game.name}</strong><span>{game.genre}</span><small>{game.id === 'skyline' && best ? `Best: ${best.toLocaleString()}` : game.description}</small></span><span className="mini-game-play"><Icon name="right" size={18} /></span>
       </button>)}
@@ -45,6 +49,7 @@ function GameScene({ game }: { game: GameId }) {
   const neon = game === 'neon';
   return <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
     <rect width="400" height="300" fill={game === 'crystal' ? '#191c36' : game === 'rally' ? '#718d62' : '#131d35'} />
+    {game === 'enterprise' && <><rect width="400" height="300" fill="#b7d3dc" /><path d="M140 70H260L370 300H30Z" fill="#536d77" /><rect x="103" y="83" width="89" height="45" rx="4" fill="#258bc5"/><rect x="208" y="83" width="89" height="45" rx="4" fill="#c65455"/><text x="148" y="116" textAnchor="middle" fontSize="30" fill="white">×2</text><text x="252" y="116" textAnchor="middle" fontSize="30" fill="white">−20</text>{Array.from({length:18},(_,i)=><ellipse key={i} cx={145+i%4*30} cy={190+Math.floor(i/4)*20} rx="13" ry="16" fill="#edb845" stroke="#ffdf87" strokeWidth="3"/>)}</>}
     {game === 'skyline' && <>
       <rect width="400" height="200" fill="#cf9e99" /><circle cx="295" cy="70" r="35" fill="#ffe0af" />
       {[30, 90, 280, 340].map((x,i) => <rect key={x} x={x} y={80+i*15} width="45" height="160" fill={i%2 ? '#788192' : '#5e6d84'} />)}
