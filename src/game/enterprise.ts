@@ -63,9 +63,10 @@ export class EnterpriseRun {
   change(amount: number, label: string) { const before = this.coins; this.coins = amount; this.events.push({ id: this.events.length, kind: amount >= before ? 'gain' : 'loss', before, after: amount, label }); if (!amount) this.state = 'over'; }
   step(dt: number) {
     if (this.state !== 'running') return;
-    dt *= 3; this.time += dt; this.x += (this.lane * 1.6 - this.x) * Math.min(1, dt * 14);
+    if(!Number.isFinite(dt)||dt<=0)return;
+    const beforeTime=this.time,beforeX=this.x;dt=Math.min(dt,.05)*3;this.time += dt; this.x += (this.lane * 1.6 - this.x) * Math.min(1, dt * 14);
     if (this.pickup < 6 && this.time >= 2.5 + this.pickup * 5) { this.pickup++; this.change(this.coins + 10, '+10'); }
-    if (this.row < 6 && this.time >= 5 + this.row * 5) { const gate = this.pair(this.row)[this.x < 0 ? 0 : 1]; this.row++; this.change(applyGate(this.coins, gate), gateText(gate)); }
+    if (this.row < 6 && this.time >= 5 + this.row * 5) { const t=Math.max(0,Math.min(1,(5+this.row*5-beforeTime)/dt));const crossX=beforeX+(this.x-beforeX)*t;const gate = this.pair(this.row)[crossX < 0 ? 0 : 1]; this.row++; this.change(applyGate(this.coins, gate), gateText(gate)); }
     if (this.time >= 34 && this.state === 'running') this.state = 'finish';
   }
 }
@@ -75,13 +76,21 @@ export const SHOP_PADS = SHOPS.map((_, i) => ({ x: 1.5, z: 6 - i * 6 }));
 export class BusinessWalk {
   x = -2; z = 1; target: { x: number; z: number } | null = null; zone = -2;
   keys = new Set<string>(); moving = false;
-  step(dt: number): number | null {
+  step(dt: number,levels: readonly number[]=[]): number | null {
+    dt=Math.min(Math.max(0,dt),.05);
     let dx = Number(this.keys.has('right')) - Number(this.keys.has('left'));
     let dz = Number(this.keys.has('down')) - Number(this.keys.has('up'));
     if (dx || dz) this.target = null;
     else if (this.target) { dx = this.target.x - this.x; dz = this.target.z - this.z; if (Math.hypot(dx,dz)<.08) {this.target=null;dx=0;dz=0;} }
     const length = Math.hypot(dx,dz); this.moving=length>0;
-    if (length) { const step = Math.min(12*dt, this.target ? length : Infinity); this.x = Math.max(-10,Math.min(10,this.x+dx/length*step)); this.z = Math.max(-11,Math.min(10,this.z+dz/length*step)); }
+    if (length) {
+      const distance=Math.min(12*dt,this.target?length:Infinity),parts=Math.max(1,Math.ceil(distance/.15));
+      const blocked=(x:number,z:number)=>levels.some((level,i)=>level>0&&((Math.abs(x-4.5)<1.86&&z>6-i*6-1.76&&z<6-i*6+2.5)||(level>1&&Math.abs(x-6.3)<.71&&Math.abs(z-(6-i*6+.9))<.71)));
+      for(let i=0;i<parts;i++){
+        const nx=Math.max(-10,Math.min(10,this.x+dx/length*distance/parts));if(!blocked(nx,this.z))this.x=nx;
+        const nz=Math.max(-11,Math.min(10,this.z+dz/length*distance/parts));if(!blocked(this.x,nz))this.z=nz;
+      }
+    }
     const pads=[RUN_PAD,...SHOP_PADS];const zone=pads.findIndex(p=>Math.abs(p.x-this.x)<1.05&&Math.abs(p.z-this.z)<1.05)-1;
     if(zone===this.zone)return null;this.zone=zone;return zone>=-1?zone:null;
   }

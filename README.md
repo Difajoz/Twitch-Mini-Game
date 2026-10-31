@@ -65,7 +65,7 @@ References: [Twitch embed requirements](https://dev.twitch.tv/docs/embed/), [int
 - `src/game/renderer.ts`: Three.js geometry, character animation, recycled tiles and obstacle pools.
 - `src/components/GamePanel.tsx`: game host, scoped input, focus/visibility pauses and explicit states.
 
-The opening has 96 meters before the first hazard. Introductions use one hazard lane; later rows use two with a token-guided bypass lane. At maximum speed rows are approximately 2.13 seconds apart, allowing a complete two-lane transition and recovery. The fixed-step route tests exercise 64 seeds for 5 km each at maximum speed using actual collision and movement. The generator intentionally uses conservative rows rather than complex sequences at this milestone. Tests also cover jump, slide, gaps, collision, scoring, pausing, frame cadence, parsing and API failure/refresh behavior. Browser play is still necessary to assess feel and readability.
+The opening has 96 meters before the first hazard. Introductions use one hazard lane; later rows use two with a token-guided bypass lane. At maximum speed rows are approximately 0.71 seconds apart, allowing a complete two-lane dodge and a short reaction margin. The fixed-step route tests exercise 64 seeds for 5 km each at maximum speed using actual collision and movement. The generator intentionally uses conservative rows rather than complex sequences at this milestone. Tests also cover jump, slide, gaps, collision, scoring, pausing, frame cadence, parsing and API failure/refresh behavior. Browser play is still necessary to assess feel and readability.
 
 Long frame gaps pause rather than skipping obstacles. Pixel ratio is capped at 1.5, there is no postprocessing or realtime shadow map, GPU geometry/materials are shared, and track tiles and hazard objects are recycled. Render loops, event handlers, resize observers and GPU resources are released on disposal.
 
@@ -73,7 +73,7 @@ See [BUILD_STATUS.md](BUILD_STATUS.md) for verified results and outstanding inte
 
 ## Runner tuning and sound
 
-The runner starts at 18 m/s, rises to 30 m/s, and uses a 96m opening and 64m row spacing. Ten tokens award one shield per run. It absorbs one impact and briefly protects through that obstacle; it resets on a new run. A small text status identifies shield availability. The wireframe aura, speed streaks and motion toggle have been removed.
+The runner starts at 54 m/s, rises to 90 m/s, and uses a 96m opening and 64m row spacing. Ten tokens award one shield per run. It absorbs one impact and briefly protects through that obstacle; it resets on a new run. A small text status identifies shield availability. The wireframe aura, speed streaks and motion toggle have been removed.
 
 Enable the speaker for original quiet synthesized music and game effects. Music runs only during active gameplay, stops on pause/close/mute, and defaults muted. No external music samples are used. The current suite has 21 passing tests, including shield consumption and maximum-speed route tests.
 
@@ -96,3 +96,5 @@ Coins spread into new formation slots, tumble off the track on losses, stack ont
 Wallet and shop levels save in browser local storage separately from Skyline's best score. Modern browsers synchronize transactions through Web Locks. Storage failures show a session-only notice; unsupported Web Locks show a single-tab warning. In-progress runs stay in memory and are not recovered after reloading. Clicking the stream, leaving the tab, closing the rail or switching games pauses a running game and stops walking; resume explicitly. Shop menus, mode tabs and explanatory overlays have been removed in favor of physical pads, numbers and icons. Coins and gate choices are enlarged.
 
 Pocket Enterprise runs and businessman walking now move at 3× their original speeds. The business street is expanded to a 26×28 ground with wider shop spacing and a following camera. Runner coins spin sideways; hand stacks remain flat.
+
+Collision audit: Skyline uses swept body checks against visible obstacles and arch posts. A shield absorbs only the struck obstacle. The businessman collides with built shop bodies, counters and upgrade tables; empty plots remain walkable. Coin gate selection samples the lane at the crossing instant.

@@ -87,9 +87,23 @@ test('generated cross-row routes survive at maximum speed using real lane transi
   }
 });
 test('guided trails avoid hazardous lanes and rows allow enough reaction time', () => {
-  assert.ok(TUNE.rowSpacing / TUNE.maxSpeed > TUNE.laneSeconds * 2 + TUNE.slideSeconds + .5);
+  assert.ok(TUNE.rowSpacing / TUNE.maxSpeed > TUNE.laneSeconds * 2 + .35);
   for (let seed = 0; seed < 30; seed++) for (let row = 0; row < 200; row++) {
     const pattern = createRow(row, seed);
     assert.ok(pattern.tokens.every(token => !pattern.hazards.some(h => h.lane === token.lane)));
   }
 });
+
+test('visible obstacle edges collide with the runner body',()=>{
+  for(const kind of ['block','barrier','arch'] as const){const sim=isolated(kind);sim.x=1.15;sim.lane=1;sim.hazards[0].at=.1;sim.step();assert.equal(sim.state,'over',kind);}
+});
+test('swept checks catch a cargo box crossed entirely in one maximum-speed step',()=>{
+  const sim=isolated('block',1.5);sim.speed=TUNE.maxSpeed;sim.step(1/30);assert.equal(sim.state,'over');
+});
+test('one shield protects against the struck object, not a second nearby object',()=>{
+  const sim=isolated('block',1);sim.shield=true;sim.shieldEarned=true;sim.hazards.push({id:-2,lane:0,at:3,kind:'block'});advance(sim,.4);assert.equal(sim.state,'over');
+});
+test('Skyline starts and caps at three times the previous forward speed',()=>{
+  assert.equal(TUNE.startSpeed,54);assert.equal(TUNE.maxSpeed,90);const sim=new Simulation();sim.hazards=[];sim.start();advance(sim,.5);assert.ok(sim.distance>27&&sim.distance<28);
+});
+test('sliding under an arch does not pass through its supporting post',()=>{const sim=isolated('arch',.1);sim.x=.75;sim.slide=.8;sim.step();assert.equal(sim.state,'over');});

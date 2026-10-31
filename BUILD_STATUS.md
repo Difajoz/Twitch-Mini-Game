@@ -89,3 +89,9 @@ Replaced Pocket Enterprise shop menus and mode tabs with free movement (WASD/arr
 ## Faster Pocket Enterprise
 
 Tripled runner simulation time and lateral responsiveness (34 seconds → about 11.3 seconds), tripled walking speed (4 → 12 units/second), expanded the business ground to 26×28 and walking bounds to x ±10, z −11…10. Shops/pads are spread farther apart; the town camera follows the businessman. Running coins rotate sideways about the vertical axis while collection stacks remain flat. All 31 tests pass, including the new timed-run regression and updated walking checks.
+
+## Collision audit and faster Skyline
+
+Skyline speed is now 54–90 m/s (3× the previous 18–30), with acceleration scaled accordingly. Fixed-step swept checks use body-expanded obstacle bounds, including vertical arch posts while sliding. Shield protection is restricted to the object absorbed, rather than a blanket time window. Pocket Enterprise walking now uses substepped collision and wall sliding against open shops, counters and upgrade tables; pointer destinations cannot bypass those walls. Gate math uses interpolated crossing position and bounds caller time steps.
+
+All 40 tests pass: added regressions for edge grazes, fully crossed obstacles at maximum speed, successive shield impacts, arch-post collisions, shop/counter/table blocking, wall sliding and late gate switches. All six-gate routes across four round arrangements and 64 Skyline seeds over 5km at maximum speed still pass.

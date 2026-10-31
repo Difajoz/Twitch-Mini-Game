@@ -28,7 +28,7 @@ export default function EnterpriseGame({open}:{open:boolean}) {
     if(!host.current)return;let renderer:EnterpriseRenderer;try{renderer=new EnterpriseRenderer(host.current);}catch{setError('3D graphics could not start. Try a browser with hardware acceleration.');return;}
     rendererRef.current=renderer;let frame=0,last=0,ui=0,settled='',finishedAt=-1;const animate=(now:number)=>{frame=requestAnimationFrame(animate);const dt=last?Math.min((now-last)/1000,.05):0;const gap=last?(now-last)/1000:0;last=now;
       if(!active.current)return;if(gap>.25)run.current.pause();clock.current+=dt;
-      if(view.current==='run')run.current.step(dt);else {const zone=walk.current.step(dt);if(zone===-1)start();else if(zone!==null&&zone>=0)void buy(zone);}
+      if(view.current==='run')run.current.step(dt);else {const zone=walk.current.step(dt,profile.current.levels);if(zone===-1)start();else if(zone!==null&&zone>=0)void buy(zone);}
       if(run.current.state==='finish'&&settled!==run.current.id){settled=run.current.id;finishedAt=clock.current;void finish();}
       if(view.current==='run'&&run.current.state==='finish'&&finishedAt>=0&&clock.current-finishedAt>1.1&&!busy.current&&profile.current.paid.includes(run.current.id)){view.current='town';setMode('town');walk.current.x=-2;walk.current.z=1;walk.current.zone=-2;walk.current.stop();}
       if(pay.current){pay.current=Math.max(0,pay.current-dt);if(pay.current===0)setPayment(false);}

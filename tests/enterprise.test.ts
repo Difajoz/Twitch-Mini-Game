@@ -39,10 +39,19 @@ test('walking pads trigger only on entry; moving out and back permits a second i
   walk.x=RUN_PAD.x;walk.z=RUN_PAD.z;assert.equal(walk.step(0),-1);assert.equal(walk.step(.1),null);
 });
 test('free walking is normalized, bounded, and stopping clears pointer and keyboard movement',()=>{
-  const walk=new BusinessWalk();walk.keys.add('up');walk.keys.add('right');const x=walk.x,z=walk.z;walk.step(.1);assert.ok(Math.abs(Math.hypot(walk.x-x,walk.z-z)-1.2)<1e-8);
+  const walk=new BusinessWalk();walk.keys.add('up');walk.keys.add('right');const x=walk.x,z=walk.z;walk.step(.1);assert.ok(Math.abs(Math.hypot(walk.x-x,walk.z-z)-.6)<1e-8);
   walk.stop();const at=walk.x;walk.step(.1);assert.equal(walk.x,at);
   walk.target={x:SHOP_PADS[1].x,z:SHOP_PADS[1].z};for(let i=0;i<200;i++)walk.step(.01);assert.ok(Math.hypot(walk.x-SHOP_PADS[1].x,walk.z-SHOP_PADS[1].z)<.1);
-  walk.keys.add('right');walk.step(100);assert.equal(walk.x,10);
+  walk.keys.add('right');for(let i=0;i<200;i++)walk.step(.01);assert.equal(walk.x,10);
 });
 
 test('coin runs finish at three times the original speed',()=>{const run=new EnterpriseRun();run.start('fast');for(let i=0;i<11*120;i++)run.step(1/120);assert.equal(run.state,'running');for(let i=0;i<41;i++)run.step(1/120);assert.equal(run.state,'finish');assert.equal(run.row,6);});
+test('businessman cannot walk or click through an open shop',()=>{
+  for(const pointer of [false,true]){const w=new BusinessWalk();w.x=0;w.z=6;if(pointer)w.target={x:9,z:6};else w.keys.add('right');for(let i=0;i<100;i++)w.step(.016,[1,0,0]);assert.ok(w.x<2.65);}
+});
+test('building corners allow sliding alongside walls and unopened plots remain walkable',()=>{
+  const w=new BusinessWalk();w.x=2.5;w.z=6;w.keys.add('right');w.keys.add('up');for(let i=0;i<100;i++)w.step(.016,[1,0,0]);assert.ok(w.z<4.2);
+  const empty=new BusinessWalk();empty.x=0;empty.z=6;empty.keys.add('right');for(let i=0;i<100;i++)empty.step(.016,[0,0,0]);assert.ok(empty.x>6);
+});
+test('gate uses the lane at the crossing, not after a late switch',()=>{const r=new EnterpriseRun();r.start('crossing');r.time=4.99;r.x=-1.6;r.lane=1;r.step(.05);assert.equal(r.events.at(-1)?.label,'×2');});
+test('business counters and upgrade tables are solid',()=>{const w=new BusinessWalk();w.x=4.5;w.z=9;w.keys.add('up');for(let i=0;i<100;i++)w.step(.016,[1,0,0]);assert.ok(w.z>=8.49);const table=new BusinessWalk();table.x=8;table.z=6.9;table.keys.add('left');for(let i=0;i<5;i++)table.step(.016,[2,0,0]);assert.ok(table.x>=7);});
