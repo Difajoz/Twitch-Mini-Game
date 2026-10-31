@@ -14,11 +14,13 @@ export const SHOPS = [
   { name: 'Cookie Corner', short: 'COOKIES', cost: 750, bonus: 20, color: '#c48655', upgrades: [650, 1100] },
   { name: 'Burger Club', short: 'BURGERS', cost: 1800, bonus: 35, color: '#b85d51', upgrades: [1000, 1600] },
 ] as const;
-export type Profile = { version: 1; wallet: number; levels: number[]; paid: string[]; runs: number; revision: number };
-export const emptyProfile = (): Profile => ({ version: 1, wallet: 0, levels: [0, 0, 0], paid: [], runs: 0, revision: 0 });
+export type Profile = { version: 1; wallet: number; levels: number[]; invested: number[]; paid: string[]; runs: number; revision: number };
+export const emptyProfile = (): Profile => ({ version: 1, wallet: 0, levels: [0, 0, 0], invested: [0,0,0], paid: [], runs: 0, revision: 0 });
 export function parseProfile(raw: string | null): Profile {
   if (!raw) return emptyProfile();
   const p = JSON.parse(raw);
+  p.invested ??= [0,0,0];
+  if(!Array.isArray(p.invested)||p.invested.length!==3||!p.invested.every((n:number)=>Number.isSafeInteger(n)&&n>=0&&n<=1800))throw new Error('Invalid investment');
   if (p.version !== 1 || !Number.isSafeInteger(p.wallet) || p.wallet < 0 || p.wallet > 1e12 || !Array.isArray(p.levels) || p.levels.length !== 3 || !p.levels.every((v: number) => Number.isInteger(v) && v >= 0 && v <= 3) || !Array.isArray(p.paid) || !p.paid.every((s: unknown) => typeof s === 'string') || !Number.isSafeInteger(p.runs) || p.runs < 0 || !Number.isSafeInteger(p.revision) || p.revision < 0) throw new Error('Invalid saved city');
   return p;
 }
@@ -33,13 +35,21 @@ export function price(profile: Profile, index: number): number | null {
   if (!Number.isInteger(index) || index < 0 || index >= SHOPS.length) return null;
   const level = profile.levels[index];
   if (level === 3 || (level === 0 && index > 0 && profile.levels[index - 1] === 0)) return null;
-  return level === 0 ? SHOPS[index].cost : SHOPS[index].upgrades[level - 1];
+  const base=level === 0 ? SHOPS[index].cost : SHOPS[index].upgrades[level - 1];
+  return Math.max(0,base-profile.invested[index]);
 }
 export function purchase(profile: Profile, index: number): Profile {
   const cost = price(profile, index);
   if (cost === null || cost > profile.wallet) throw new Error('Purchase unavailable');
   const levels = [...profile.levels]; levels[index]++;
-  return { ...profile, wallet: profile.wallet - cost, levels, revision: profile.revision + 1 };
+  const invested=[...profile.invested];invested[index]=0;
+  return { ...profile, wallet: profile.wallet - cost, levels, invested, revision: profile.revision + 1 };
+}
+export function invest(profile:Profile,index:number):Profile {
+  const cost=price(profile,index);if(cost===null||profile.wallet===0)throw new Error('Investment unavailable');
+  if(profile.wallet>=cost)return purchase(profile,index);
+  const invested=[...profile.invested];invested[index]+=profile.wallet;
+  return {...profile,wallet:0,invested,revision:profile.revision+1};
 }
 export type EnterpriseState = 'ready' | 'running' | 'paused' | 'finish' | 'over';
 export class EnterpriseRun {
@@ -59,3 +69,22 @@ export class EnterpriseRun {
     if (this.time >= 34 && this.state === 'running') this.state = 'finish';
   }
 }
+
+export const RUN_PAD = { x: -3, z: -4.5 };
+export const SHOP_PADS = SHOPS.map((_, i) => ({ x: .2, z: 3 - i * 4 }));
+export class BusinessWalk {
+  x = -2; z = 1; target: { x: number; z: number } | null = null; zone = -2;
+  keys = new Set<string>(); moving = false;
+  step(dt: number): number | null {
+    let dx = Number(this.keys.has('right')) - Number(this.keys.has('left'));
+    let dz = Number(this.keys.has('down')) - Number(this.keys.has('up'));
+    if (dx || dz) this.target = null;
+    else if (this.target) { dx = this.target.x - this.x; dz = this.target.z - this.z; if (Math.hypot(dx,dz)<.08) {this.target=null;dx=0;dz=0;} }
+    const length = Math.hypot(dx,dz); this.moving=length>0;
+    if (length) { const step = Math.min(4*dt, this.target ? length : Infinity); this.x = Math.max(-5,Math.min(5,this.x+dx/length*step)); this.z = Math.max(-6.5,Math.min(6,this.z+dz/length*step)); }
+    const pads=[RUN_PAD,...SHOP_PADS];const zone=pads.findIndex(p=>Math.abs(p.x-this.x)<1.05&&Math.abs(p.z-this.z)<1.05)-1;
+    if(zone===this.zone)return null;this.zone=zone;return zone>=-1?zone:null;
+  }
+  stop(){this.keys.clear();this.target=null;this.moving=false;}
+}
+
