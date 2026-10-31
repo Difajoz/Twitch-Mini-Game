@@ -85,3 +85,7 @@ Validation: TypeScript and production build pass. All 21 existing tests pass usi
 ## Walk-to-invest revision
 
 Replaced Pocket Enterprise shop menus and mode tabs with free movement (WASD/arrows, pointer destination and held directional buttons). Runs must finish before the business street is accessible; payout automatically returns the businessman to town. Entering a shop pad invests available wallet cash, including saved partial funding; leaving and re-entering is required to invest again. A physical gold RUN pad starts the next run. Coins are larger, runner camera closer, gate signs taller and the large numeric choices are clickable. The visible game UI is reduced to currency, gate numbers, play/pause and movement icons. Existing saved cities migrate with zero initial partial funding.
+
+## Faster Pocket Enterprise
+
+Tripled runner simulation time and lateral responsiveness (34 seconds → about 11.3 seconds), tripled walking speed (4 → 12 units/second), expanded the business ground to 26×28 and walking bounds to x ±10, z −11…10. Shops/pads are spread farther apart; the town camera follows the businessman. Running coins rotate sideways about the vertical axis while collection stacks remain flat. All 31 tests pass, including the new timed-run regression and updated walking checks.

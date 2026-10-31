@@ -20,8 +20,8 @@ export class EnterpriseRenderer {
     for(const x of [-4.45,4.45]) this.box(this.road,x,.02,-32,.13,.15,94,'#e7d5ad');
     for(let i=0;i<26;i++) this.box(this.road,0,.005,-i*4,.05,.02,1.3,'#dce8e5');
     for(let i=0;i<14;i++){const x=(i%2?1:-1)*(7+(i%3)*2);this.box(this.road,x,-2,-i*7,3,3+i%4,4,['#719ca2','#8daab0','#b8c2b1'][i%3]);}
-    this.box(this.town,0,-.22,0,16,.4,16,'#92aaa2'); this.box(this.town,1,0,0,11,.06,12,'#d1c7af');
-    for(let i=0;i<3;i++){const g=new T.Group();g.position.set(3,0,3-i*4);this.town.add(g);this.shopGroups.push(g);}
+    this.box(this.town,0,-.22,0,26,.4,28,'#92aaa2'); this.box(this.town,1,0,0,22,.06,24,'#d1c7af');
+    for(let i=0;i<3;i++){const g=new T.Group();g.position.set(4.5,0,6-i*6);this.town.add(g);this.shopGroups.push(g);}
     const man=this.man;man.position.set(-2,0,1);this.town.add(man);
     this.box(man,0,1.35,0,.85,1.05,.48,'#344c60');this.box(man,0,1.42,.25,.24,.8,.03,'#e9e4cd');
     this.box(man,0,.62,0,.68,.45,.44,'#293e52');
@@ -38,7 +38,7 @@ export class EnterpriseRenderer {
   mat(color:string){const cached=this.materialCache.get(color);if(cached)return cached;const m=new T.MeshStandardMaterial({color,roughness:.72});this.materials.push(m);this.materialCache.set(color,m);return m;}
   box(g:T.Group,x:number,y:number,z:number,w:number,h:number,d:number,color:string){const m=new T.Mesh(new T.BoxGeometry(w,h,d),this.mat(color));m.position.set(x,y,z);g.add(m);return m;}
   sign(text:string,color:string,w:number,h:number){const key=text+color;const cached=this.signCache.get(key);if(cached)return new T.Mesh(new T.PlaneGeometry(w,h),cached);const c=document.createElement('canvas');c.width=512;c.height=192;const ctx=c.getContext('2d')!;ctx.fillStyle=color;ctx.fillRect(0,0,512,192);ctx.strokeStyle='#ffffff60';ctx.lineWidth=8;ctx.strokeRect(8,8,496,176);ctx.fillStyle='#fff';ctx.font=`800 ${text.length>8?46:90}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,256,102);const tex=new T.CanvasTexture(c);tex.colorSpace=T.SRGBColorSpace;this.textures.push(tex);const mat=new T.MeshBasicMaterial({map:tex,side:T.DoubleSide});this.materials.push(mat);this.signCache.set(key,mat);return new T.Mesh(new T.PlaneGeometry(w,h),mat);}
-  groundPoint(clientX:number,clientY:number){const rect=this.host.getBoundingClientRect();const ray=new T.Raycaster();ray.setFromCamera(new T.Vector2((clientX-rect.left)/rect.width*2-1,-(clientY-rect.top)/rect.height*2+1),this.camera);const hit=new T.Vector3();if(!ray.ray.intersectPlane(new T.Plane(new T.Vector3(0,1,0),0),hit))return null;return {x:Math.max(-5,Math.min(5,hit.x)),z:Math.max(-6.5,Math.min(6,hit.z))};}
+  groundPoint(clientX:number,clientY:number){const rect=this.host.getBoundingClientRect();const ray=new T.Raycaster();ray.setFromCamera(new T.Vector2((clientX-rect.left)/rect.width*2-1,-(clientY-rect.top)/rect.height*2+1),this.camera);const hit=new T.Vector3();if(!ray.ray.intersectPlane(new T.Plane(new T.Vector3(0,1,0),0),hit))return null;return {x:Math.max(-10,Math.min(10,hit.x)),z:Math.max(-11,Math.min(10,hit.z))};}
   rebuildTown(p:Profile){
     while(this.pads.children.length){const old=this.pads.children[0];old.traverse(n=>{if(n instanceof T.Mesh)n.geometry.dispose();});this.pads.remove(old);}
     [RUN_PAD,...SHOP_PADS].forEach((pad,i)=>{const cost=i?price(p,i-1):0;const color=i===0?'#c29643':cost!==null&&cost<=p.wallet?'#3e927c':'#73898b';this.box(this.pads,pad.x,.06,pad.z,1.65,.12,1.65,color);const label=this.sign(i===0?'▶ RUN':cost===null?'—':String(cost),color,1.6,1.25);label.rotation.x=-Math.PI/2;label.position.set(pad.x,.13,pad.z);this.pads.add(label);});
@@ -68,16 +68,16 @@ export class EnterpriseRenderer {
     const town=phase!=='run';this.road.visible=!town;this.town.visible=town;this.gates.visible=!town;
     if(!town){if(this.seen!==run.row||!this.gates.children.length){this.rebuildGates(run);this.seen=run.row;}this.gates.children.forEach(g=>g.position.z=-(g.userData.at-run.time)*4);this.pickups.visible=run.pickup<6;this.pickups.position.z=-(2.5+run.pickup*5-run.time)*4;
       if(this.lastCount!==run.coins){this.count(run.coins,run);this.lastCount=run.coins;}
-      const cols=Math.min(5,Math.max(2,Math.ceil(Math.sqrt(this.active.length))));this.active.forEach((c,i)=>{c.target.set(run.x+((i%cols)-(cols-1)/2)*.57,.34,Math.floor(i/cols)*.43+.2);c.mesh.rotation.x=Math.PI/2;c.mesh.rotation.z=-this.clock*8;});
+      const cols=Math.min(5,Math.max(2,Math.ceil(Math.sqrt(this.active.length))));this.active.forEach((c,i)=>{c.target.set(run.x+((i%cols)-(cols-1)/2)*.57,.34,Math.floor(i/cols)*.43+.2);c.mesh.rotation.set(0,-run.time*8,Math.PI/2);});
       this.camera.position.lerp(new T.Vector3(run.x*.12,5.3,8),this.reduced?1:.12);this.camera.lookAt(0,.4,-3.5);
     } else {
       const mx=phase==='finish'?-2:walk?.x??-2,mz=phase==='finish'?1:walk?.z??1;this.man.position.set(mx,walk?.moving&&phase!=='finish'?Math.sin(this.clock*16)*.045:0,mz);
       const count=phase==='finish'?Math.min(64,run.coins):phase==='pay'?this.payKeep+Math.ceil((this.payInitial-this.payKeep)*(1-payment)):Math.min(48,Math.ceil(p.wallet/5));
       while(this.active.length<count){const c=this.acquire();c.mesh.visible=true;c.flying=false;c.age=0;c.delay=0;c.mesh.position.set(-3,.4,5);this.active.push(c);}
-      while(this.active.length>count){const c=this.active.pop()!;c.flying=phase==='pay';c.payment=c.flying;c.age=0;c.start.copy(c.mesh.position);c.velocity.set(3,.6,3-shop*4);if(!c.flying)c.mesh.visible=false;}
+      while(this.active.length>count){const c=this.active.pop()!;c.flying=phase==='pay';c.payment=c.flying;c.age=0;c.start.copy(c.mesh.position);c.velocity.set(4.5,.6,6-shop*6);if(!c.flying)c.mesh.visible=false;}
       this.active.forEach((c,i)=>{const t=Math.min(1,Math.max(0,(this.phaseTime-i*.008)/.24));const goal=new T.Vector3(mx+.95+(i%2-.5)*.36,1.83+Math.floor(i/4)*.045,mz+.4+(Math.floor(i/2)%2-.5)*.36);if(phase==='finish'&&t<1){c.target.set(T.MathUtils.lerp((i%7-3)*.35,goal.x,t),T.MathUtils.lerp(.2,goal.y,t)+Math.sin(t*Math.PI)*1.6,T.MathUtils.lerp(5+Math.floor(i/7)*.25,goal.z,t));}else c.target.copy(goal);c.mesh.rotation.set(0,this.clock*.1,0);});
       this.hand.position.x=mx+.95;this.hand.position.z=mz+.4;this.hand.position.y=1.7+(this.reduced?0:Math.sin(this.clock*25)*.012);this.customer.visible=p.levels.some(Boolean);this.customer.position.z=3-Math.sin(this.clock*.5)*2;this.shopGroups.forEach((g,i)=>{g.scale.y=phase==='pay'&&i===shop?.05+.95*Math.min(1,payment*1.6):1;});
-      this.camera.position.lerp(phase==='finish'?new T.Vector3(3,5.3,10):new T.Vector3(0,16,15),this.reduced?1:.1);this.camera.lookAt(phase==='finish'?-1:0,1,phase==='finish'?1:0);
+      this.camera.position.lerp(phase==='finish'?new T.Vector3(3,5.3,10):new T.Vector3(mx*.55,17,mz*.55+15),this.reduced?1:.1);this.camera.lookAt(phase==='finish'?-1:mx*.55,1,phase==='finish'?1:mz*.55);
     }
     this.coins.forEach(c=>{if(!c.mesh.visible)return;if(c.flying){if(this.reduced){c.mesh.visible=false;return;}c.age+=dt;if(c.payment){const t=Math.min(1,c.age/.2);c.mesh.position.lerpVectors(c.start,c.velocity,t);c.mesh.position.y+=Math.sin(t*Math.PI)*.7;c.mesh.rotation.z+=dt*5;if(t===1)c.mesh.visible=false;return;}c.velocity.y-=15*dt;c.mesh.position.addScaledVector(c.velocity,dt);c.mesh.rotation.z+=dt*8;if(c.mesh.position.y < -6||c.age>1)c.mesh.visible=false;}else{c.delay-=dt;if(c.delay<=0)c.mesh.position.lerp(c.target,this.reduced?1:Math.min(1,dt*15));}});
     this.gl.render(this.scene,this.camera);

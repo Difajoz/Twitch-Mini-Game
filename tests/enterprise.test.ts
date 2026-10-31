@@ -39,8 +39,10 @@ test('walking pads trigger only on entry; moving out and back permits a second i
   walk.x=RUN_PAD.x;walk.z=RUN_PAD.z;assert.equal(walk.step(0),-1);assert.equal(walk.step(.1),null);
 });
 test('free walking is normalized, bounded, and stopping clears pointer and keyboard movement',()=>{
-  const walk=new BusinessWalk();walk.keys.add('up');walk.keys.add('right');const x=walk.x,z=walk.z;walk.step(.1);assert.ok(Math.abs(Math.hypot(walk.x-x,walk.z-z)-.4)<1e-8);
+  const walk=new BusinessWalk();walk.keys.add('up');walk.keys.add('right');const x=walk.x,z=walk.z;walk.step(.1);assert.ok(Math.abs(Math.hypot(walk.x-x,walk.z-z)-1.2)<1e-8);
   walk.stop();const at=walk.x;walk.step(.1);assert.equal(walk.x,at);
   walk.target={x:SHOP_PADS[1].x,z:SHOP_PADS[1].z};for(let i=0;i<200;i++)walk.step(.01);assert.ok(Math.hypot(walk.x-SHOP_PADS[1].x,walk.z-SHOP_PADS[1].z)<.1);
-  walk.keys.add('right');walk.step(100);assert.equal(walk.x,5);
+  walk.keys.add('right');walk.step(100);assert.equal(walk.x,10);
 });
+
+test('coin runs finish at three times the original speed',()=>{const run=new EnterpriseRun();run.start('fast');for(let i=0;i<11*120;i++)run.step(1/120);assert.equal(run.state,'running');for(let i=0;i<41;i++)run.step(1/120);assert.equal(run.state,'finish');assert.equal(run.row,6);});
