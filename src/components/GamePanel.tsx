@@ -72,33 +72,30 @@ export default function GamePanel({ open, best, muted, onBest, onClose, onMute }
     if (action) { event.preventDefault(); if (!event.repeat) sim.current.input(action); }
   };
   const state = snapshot.state;
-  return <section ref={panel} className="game-panel" tabIndex={0} aria-label="Skyline Sprint game. Use arrow keys or W A S D. Escape to pause." onKeyDown={keyboard}
+  return <section ref={panel} className="game-panel skyline-minimal" tabIndex={0} aria-label="Skyline Sprint game. Use arrow keys or W A S D. Escape to pause." onKeyDown={keyboard}
     onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) pause(); }}
     onPointerDown={event => { if (!(event.target instanceof HTMLElement && event.target.closest('button'))) panel.current?.focus(); }}>
-    <div className="game-topbar"><div><span className="tiny-dot" /> SKYLINE SPRINT <span className="build-label">01</span></div><div className="game-tools">
+    <div className="game-topbar"><div><span className="tiny-dot" /> SKYLINE SPRINT</div><div className="game-tools">
       <button className="icon-button" title={muted ? 'Enable music and game sound' : 'Mute music and game sound'} aria-label={muted ? 'Turn game sound on' : 'Mute game sound'} onClick={toggleSound}>{muted ? <Speaker muted /> : <Speaker />}</button>
       <button className="icon-button" title="Pause game" aria-label="Pause game" disabled={state !== 'running'} onClick={pause}>Ⅱ</button>
       <button className="icon-button" title="Close game" aria-label="Close game" onClick={onClose}>×</button>
     </div></div>
     <div className="game-view">
       <div className="three-viewport" ref={viewport} aria-hidden="true" />
-      <span className="shield-status">{sim.current.shield ? 'Shield ready' : sim.current.protectedUntil > sim.current.time ? 'Shield saved you' : ''}</span>
-      <div className="game-hud"><div><span>DISTANCE</span><strong>{Math.floor(snapshot.distance).toLocaleString()}<small> m</small></strong></div><div className="token-count"><i>◇</i> {snapshot.tokens}</div></div>
-      <div className="best-chip">BEST {best.toLocaleString()}</div>
+      {(sim.current.shield || sim.current.protectedUntil > sim.current.time) && <span className="shield-status" role="img" aria-label="Shield active" title="Shield active">⬡</span>}
+      <div className="game-hud"><div aria-label="Distance"><strong>{Math.floor(snapshot.distance).toLocaleString()}<small> m</small></strong></div><div className="token-count"><i>◇</i> {snapshot.tokens}</div></div>
+      <div className="best-chip" aria-label={`Best score ${best}`} title="Best score">★ {best.toLocaleString()}</div>
       {(state !== 'running' || error) && <div className={`game-overlay ${state === 'ready' ? 'ready' : ''}`}>
         <div className="overlay-card">
-          <span className="eyebrow">{error ? 'GRAPHICS UNAVAILABLE' : state === 'ready' ? 'YOUR NEXT LITTLE ADVENTURE' : state === 'paused' ? 'TAKE YOUR TIME' : 'ONE MORE RUN?'}</span>
-          <h2>{error ? 'A quick pit stop.' : state === 'ready' ? <>Chase the<br />golden hour.</> : state === 'paused' ? 'On a breather.' : 'Nice run.'}</h2>
-          <p>{error || (state === 'ready' ? 'Three lanes. Open rooftops. See how far you can go.' : state === 'paused' ? 'Your run is right where you left it.' : snapshot.reason)}</p>
-          {state === 'over' && <div className="results"><div><strong>{snapshot.score.toLocaleString()}</strong><span>SCORE</span></div><div><strong>{Math.floor(snapshot.distance)}</strong><span>METERS</span></div><div><strong>{snapshot.tokens}</strong><span>TOKENS</span></div></div>}
-          {!error && <button className="button mint" onClick={() => begin(state === 'over')}>{state === 'ready' ? 'Let’s run' : state === 'paused' ? 'Resume run' : 'Run again'} <span>↗</span></button>}
-          {state === 'paused' && <button className="text-button light" onClick={() => begin(true)}>Start a new run</button>}
-          {state === 'ready' && <div className="ready-controls"><span><kbd>←</kbd><kbd>→</kbd> dodge</span><span><kbd>↑</kbd> jump</span><span><kbd>↓</kbd> slide</span></div>}
+          {error ? <p role="alert">{error}</p> : <>
+            {state === 'over' && <strong className="skyline-score" aria-label={'Score '+snapshot.score}>{snapshot.score.toLocaleString()}</strong>}
+            <button className="skyline-play" title={state === 'paused' ? 'Resume' : state === 'over' ? 'Retry' : 'Play'} aria-label={state === 'paused' ? 'Resume Skyline Sprint' : state === 'over' ? 'Retry Skyline Sprint' : 'Play Skyline Sprint'} onClick={() => begin(state === 'over')}>{state === 'over' ? '↻' : '▶'}</button>
+            {state === 'paused' && <button className="skyline-restart" title="Restart" aria-label="Restart Skyline Sprint" onClick={() => begin(true)}>↻</button>}
+          </>}
         </div>
       </div>}
-      {state === 'running' && <div className="running-hint">← → DODGE <b>·</b> ↑ JUMP <b>·</b> ↓ SLIDE</div>}
+      {state === 'ready' && <div className="skyline-keys" aria-label="Left and right to dodge, up to jump, down to slide"><kbd title="Dodge left">←</kbd><kbd title="Dodge right">→</kbd><kbd title="Jump">↑</kbd><kbd title="Slide">↓</kbd></div>}
     </div>
-    <div className="game-bottom"><span><span className="tiny-dot mint-dot" /> {state === 'running' ? 'Click here to focus · Esc to pause' : 'Solo run · best saved on this device'}</span></div>
   </section>;
 }
 function Speaker({ muted = false }: { muted?: boolean }) { return <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 4 5 7H2v6h3l4 3Z" />{muted ? <path d="m13 7 5 6m0-6-5 6" /> : <><path d="M12 6c3 2 3 6 0 8M15 3c5 4 5 10 0 14" /></>}</svg>; }
