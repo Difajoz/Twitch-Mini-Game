@@ -24,6 +24,17 @@ test('settlement pays once, order bonuses stay secondary, purchases cannot overd
   assert.equal(parseProfile(JSON.stringify(second.profile)).wallet,75);
 });
 test('invalid saves and reward amounts are rejected',()=>{assert.throws(()=>parseProfile('{'));assert.throws(()=>parseProfile(JSON.stringify({...emptyProfile(),wallet:-1})));assert.throws(()=>settle(emptyProfile(),'a',Infinity));assert.throws(()=>settle(emptyProfile(),'a',601));assert.equal(price(emptyProfile(),99),null);});
+
+test('city saves reject invalid shapes and impossible partial funding', () => {
+  for (const value of [null, [], 4, 'city',
+    {...emptyProfile(), invested: [250, 0, 0]},
+    {...emptyProfile(), invested: [0, 1, 0]},
+    {...emptyProfile(), levels: [0, 1, 0]},
+    {...emptyProfile(), levels: [3, 0, 0], invested: [1, 0, 0]},
+  ]) assert.throws(() => parseProfile(JSON.stringify(value)));
+  const partial = {...emptyProfile(), levels: [1, 0, 0], invested: [349, 0, 0]};
+  assert.equal(price(parseProfile(JSON.stringify(partial)), 0), 1);
+});
 test('partial investments persist and completion spends only the remainder',()=>{
   let p=invest({...emptyProfile(),wallet:100},0);assert.equal(p.wallet,0);assert.equal(p.invested[0],100);assert.equal(price(p,0),150);assert.equal(p.levels[0],0);
   p=parseProfile(JSON.stringify(p));p=invest({...p,wallet:200},0);assert.equal(p.wallet,50);assert.equal(p.levels[0],1);assert.equal(p.invested[0],0);assert.equal(price(p,0),350);

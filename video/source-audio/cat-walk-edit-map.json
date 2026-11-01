@@ -1,0 +1,38 @@
+{
+  "title": "Cat Walk",
+  "artist": "Arulo",
+  "mixkitId": 371,
+  "duration": 43.03333333333333,
+  "sourcePlaybackRate": 1,
+  "crossfadeSeconds": 0.15,
+  "cuts": [
+    {
+      "label": "Opening and feature scenes",
+      "at": 0,
+      "end": 14.166666666666666,
+      "source": 12,
+      "gain": 1
+    },
+    {
+      "label": "Live preview / breakdown",
+      "at": 14.166666666666666,
+      "end": 21.166666666666668,
+      "source": 60,
+      "gain": 1
+    },
+    {
+      "label": "Codex process",
+      "at": 21.166666666666668,
+      "end": 35.03333333333333,
+      "source": 28,
+      "gain": 0.8
+    },
+    {
+      "label": "Signature and closing credits",
+      "at": 35.03333333333333,
+      "end": 43.03333333333333,
+      "source": 108,
+      "gain": 0.8
+    }
+  ]
+}

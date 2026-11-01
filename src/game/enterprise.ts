@@ -19,10 +19,19 @@ export const emptyProfile = (): Profile => ({ version: 1, wallet: 0, levels: [0,
 export function parseProfile(raw: string | null): Profile {
   if (!raw) return emptyProfile();
   const p = JSON.parse(raw);
+  if (!p || typeof p !== 'object' || Array.isArray(p)) throw new Error('Invalid saved city');
   p.invested ??= [0,0,0];
   if(!Array.isArray(p.invested)||p.invested.length!==3||!p.invested.every((n:number)=>Number.isSafeInteger(n)&&n>=0&&n<=1800))throw new Error('Invalid investment');
   if (p.version !== 1 || !Number.isSafeInteger(p.wallet) || p.wallet < 0 || p.wallet > 1e12 || !Array.isArray(p.levels) || p.levels.length !== 3 || !p.levels.every((v: number) => Number.isInteger(v) && v >= 0 && v <= 3) || !Array.isArray(p.paid) || !p.paid.every((s: unknown) => typeof s === 'string') || !Number.isSafeInteger(p.runs) || p.runs < 0 || !Number.isSafeInteger(p.revision) || p.revision < 0) throw new Error('Invalid saved city');
-  return p;
+  // A partial investment must be less than the remaining tier's actual price.
+  // Reject impossible saves rather than letting them unlock a shop for free.
+  for (let i = 0; i < SHOPS.length; i++) {
+    const level = p.levels[i];
+    const cost = level === 3 ? 0 : level === 0 ? SHOPS[i].cost : SHOPS[i].upgrades[level - 1];
+    if ((level === 3 ? p.invested[i] !== 0 : p.invested[i] >= cost) ||
+      (i > 0 && p.levels[i - 1] === 0 && (level > 0 || p.invested[i] > 0))) throw new Error('Invalid saved city');
+  }
+  return { version: 1, wallet: p.wallet, levels: [...p.levels], invested: [...p.invested], paid: [...p.paid], runs: p.runs, revision: p.revision };
 }
 export function settle(profile: Profile, id: string, coins: number) {
   if (!Number.isInteger(coins) || coins < 0 || coins > 600 || !id) throw new Error('Invalid run');

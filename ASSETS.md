@@ -14,4 +14,8 @@
 | Directory preview thumbnails, avatars and category covers | Public `static-cdn.jtvnw.net` image URLs observed on Twitch's homepage | Third-party Twitch/creator/publisher assets, loaded remotely; no ownership or redistribution license asserted. Sources and capture date are recorded in `src/lib/twitch-reference.ts`. |
 | Official chat | Twitch chat embed, hostname-derived parent | Twitch controls availability, authentication and moderation. No chat messages are bundled or simulated. |
 
-Runtime libraries: Next.js, React and Three.js are MIT licensed. Dependency licenses remain with their packages. No reference-game models, characters, environments, audio or screenshots are used. No broadcast footage is included. Demo footage and final distribution licensing still need selection before submission.
+Runtime libraries: Next.js, React and Three.js are MIT licensed. Dependency licenses remain with their packages. No reference-game models, characters, environments, audio or screenshots are used by the website.
+
+The separate optional `video/` directory contains real broadcast/page captures, generated illustrations, a Codex attribution icon and motion graphics. See `video/ASSET_MANIFEST.md` and `video/source-audio/CREDITS.md` for provenance. Standalone licensed stock music and unused private Codex chat captures are excluded from Git. Recorded third-party broadcasts still need permission before public submission. The main film's illustrated Codex cards are explicitly illustrations, not real conversation footage.
+
+The app's purple controller favicon is original SVG geometry authored in this project.

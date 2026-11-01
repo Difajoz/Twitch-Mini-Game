@@ -3,3 +3,20 @@
 .enterprise-walk .enterprise-scene{min-height:230px}.enterprise-controls{height:38px;flex:none;display:flex;gap:8px;justify-content:center;align-items:center;background:#203337}.enterprise-controls button{font-size:24px;width:48px;height:31px;background:#ffffff10;border:1px solid #ffffff20;border-radius:5px;touch-action:none;line-height:1}.enterprise-play{width:65px;height:65px;border-radius:50%;background:#e3c47e;color:#203337;font-size:28px;box-shadow:0 4px 0 #0003}.enterprise-walk .enterprise-overlay{background:#152b3166}.enterprise-walk .enterprise-choice{gap:10px;bottom:12px}.enterprise-walk .enterprise-choice span{font-size:32px;min-width:105px;padding:6px 14px;opacity:1;border-width:3px}.enterprise-walk .enterprise-hud strong{font-size:28px}.enterprise-walk-hint{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:9px;color:#244548;pointer-events:none}.enterprise-walk .enterprise-receipt strong{font-size:28px}.enterprise-walk .enterprise-receipt{bottom:14px}
 
 .enterprise-walk .enterprise-choice{pointer-events:auto}.enterprise-walk .enterprise-choice button{font-size:32px;min-width:105px;padding:6px 14px;border:3px solid transparent;border-radius:4px;font-weight:800;color:white}.enterprise-walk .enterprise-choice button.gain{background:#267fb8}.enterprise-walk .enterprise-choice button.loss{background:#bd4c51}.enterprise-walk .enterprise-choice button.chosen{border-color:white}
+
+/* Match the Twitch shell while keeping the gold currency readable in the game. */
+.enterprise-game{border-color:#53535f;border-radius:4px;background:var(--surface);color:var(--ink)}
+.enterprise-game:focus-visible{outline-color:var(--purple)}
+.enterprise-bar,.enterprise-controls{background:var(--surface)}
+.enterprise-bar{border-bottom:1px solid var(--line);gap:8px;letter-spacing:.4px}
+.enterprise-bar strong{font-size:10px;min-width:0}
+.enterprise-wallet{white-space:nowrap;font-variant-numeric:tabular-nums}
+.enterprise-play,.enterprise-game .button.primary{background:var(--purple);color:white}
+.enterprise-play:hover,.enterprise-game .button.primary:hover{background:var(--purple-hover);color:white}
+.enterprise-controls button:hover,.enterprise-controls button:active{background:var(--purple);color:white}
+.enterprise-controls button{height:32px}
+.enterprise-notice{padding:8px 10px;margin:0;background:#29232f;color:#e1caff;line-height:1.5;text-align:left;font-size:11px}
+.enterprise-walk .enterprise-choice button{min-width:86px;font-size:28px;padding:5px 12px}
+.enterprise-walk .enterprise-choice button:focus-visible{outline-offset:3px}
+.enterprise-walk .enterprise-choice button.chosen{box-shadow:0 2px 8px #0004}
+@media(max-height:740px){.enterprise-walk .enterprise-scene{min-height:180px}}

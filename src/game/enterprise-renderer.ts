@@ -9,11 +9,13 @@ export class EnterpriseRenderer {
   gold = new T.MeshStandardMaterial({color:'#edb845',metalness:.65,roughness:.28}); rim = new T.MeshStandardMaterial({color:'#ffe5a0',metalness:.5,roughness:.3});
   materials: T.Material[] = []; materialCache = new Map<string,T.Material>(); textures: T.Texture[] = []; seen = 0; lastCount = -1; clock = 0; phaseTime = 0; phase = ''; levelKey = ''; shopGroups: T.Group[] = [];
   man = new T.Group(); pads = new T.Group(); hand = new T.Group(); payShop = 0; payInitial = 0; payKeep = 0; signCache = new Map<string,T.Material>(); customer = new T.Group(); reduced = false;
-  constructor(public host: HTMLElement) {
+  private contextLost = (event: Event) => { event.preventDefault(); this.onLost(); };
+  constructor(public host: HTMLElement, private onLost: () => void = () => {}) {
     this.reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.gl = new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
     this.gl.setPixelRatio(Math.min(devicePixelRatio,1.5)); this.gl.outputColorSpace=T.SRGBColorSpace; this.gl.setClearColor('#b7d3dc');
     host.appendChild(this.gl.domElement); this.scene.fog=new T.Fog('#b7d3dc',45,105);
+    this.gl.domElement.addEventListener('webglcontextlost', this.contextLost);
     this.scene.add(new T.HemisphereLight('#fff7dc','#758e9b',2.7)); const sun=new T.DirectionalLight('#fff0ce',3);sun.position.set(-8,18,10);this.scene.add(sun);
     this.scene.add(this.road,this.town,this.gates);this.town.add(this.pads);this.road.add(this.pickups);for(let i=0;i<10;i++){const coin=new T.Mesh(this.coinGeo,this.gold);coin.rotation.x=Math.PI/2;coin.position.set((i<5?-1.6:1.6)+(i%5-2)*.25,.23,0);this.pickups.add(coin);}
     this.box(this.road,0,-.28,-32,9,.5,94,'#536d77');
@@ -63,7 +65,7 @@ export class EnterpriseRenderer {
   }
   resize(){const w=this.host.clientWidth,h=this.host.clientHeight;if(!w||!h)return;this.gl.setSize(w,h);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();}
   render(run:EnterpriseRun,p:Profile,mode:'run'|'town',dt:number,payment:number,shop:number,keepFraction=0,walk?:BusinessWalk){
-    this.clock+=dt;const key=p.levels.join(',')+':'+p.wallet;if(key!==this.levelKey){this.rebuildTown(p);this.levelKey=key;}
+    this.clock+=dt;const key=p.levels.join(',')+':'+p.invested.join(',')+':'+p.wallet;if(key!==this.levelKey){this.rebuildTown(p);this.levelKey=key;}
     const phase=payment>0?'pay':mode==='town'?'town':run.state==='finish'?'finish':'run';if(phase!==this.phase){this.phase=phase;this.phaseTime=0;this.payInitial=this.active.length;this.payKeep=Math.floor(this.payInitial*keepFraction);}else this.phaseTime+=dt;
     const town=phase!=='run';this.road.visible=!town;this.town.visible=town;this.gates.visible=!town;
     if(!town){if(this.seen!==run.row||!this.gates.children.length){this.rebuildGates(run);this.seen=run.row;}this.gates.children.forEach(g=>g.position.z=-(g.userData.at-run.time)*4);this.pickups.visible=run.pickup<6;this.pickups.position.z=-(2.5+run.pickup*5-run.time)*4;
@@ -82,5 +84,5 @@ export class EnterpriseRenderer {
     this.coins.forEach(c=>{if(!c.mesh.visible)return;if(c.flying){if(this.reduced){c.mesh.visible=false;return;}c.age+=dt;if(c.payment){const t=Math.min(1,c.age/.2);c.mesh.position.lerpVectors(c.start,c.velocity,t);c.mesh.position.y+=Math.sin(t*Math.PI)*.7;c.mesh.rotation.z+=dt*5;if(t===1)c.mesh.visible=false;return;}c.velocity.y-=15*dt;c.mesh.position.addScaledVector(c.velocity,dt);c.mesh.rotation.z+=dt*8;if(c.mesh.position.y < -6||c.age>1)c.mesh.visible=false;}else{c.delay-=dt;if(c.delay<=0)c.mesh.position.lerp(c.target,this.reduced?1:Math.min(1,dt*15));}});
     this.gl.render(this.scene,this.camera);
   }
-  dispose(){this.observer.disconnect();const geometries=new Set<T.BufferGeometry>();this.scene.traverse(o=>{if(o instanceof T.Mesh)geometries.add(o.geometry);});geometries.forEach(g=>g.dispose());this.materials.forEach(m=>m.dispose());this.textures.forEach(t=>t.dispose());this.gold.dispose();this.rim.dispose();this.gl.dispose();this.gl.domElement.remove();}
+  dispose(){this.observer.disconnect();this.gl.domElement.removeEventListener('webglcontextlost',this.contextLost);const geometries=new Set<T.BufferGeometry>([this.coinGeo,this.rimGeo]);this.scene.traverse(o=>{if(o instanceof T.Mesh)geometries.add(o.geometry);});geometries.forEach(g=>g.dispose());this.materials.forEach(m=>m.dispose());this.textures.forEach(t=>t.dispose());this.gold.dispose();this.rim.dispose();this.gl.dispose();this.gl.domElement.remove();}
 }

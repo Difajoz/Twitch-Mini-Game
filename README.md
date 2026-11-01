@@ -1,21 +1,21 @@
-# Sidequest
+# Sidequest — Twitch Mini Games
 
-A solo game companion beside an official Twitch stream. The first playable game, **Skyline Sprint**, is an original low-poly 3D rooftop runner. App and game names, art direction and character are provisional.
+Watch an official Twitch stream and play a short solo game beside it. Open **Mini games**, choose a game, and keep the broadcast in view. Built with Codex, Next.js, React, TypeScript and Three.js.
 
-The current interface recreates Twitch's dark homepage/channel presentation at the user's request: 50px top navigation, collapsible channel sidebar, centered search, featured carousel, stream cards, category covers, channel tabs, menus and purple controls. The **Mini games** button opens a right sidebar while the homepage and stream remain visible. Selecting a game places it in the upper half of the bar, with the scrollable game library below. The original green marketing layout has been replaced.
+**Two games are playable:** Skyline Sprint and Pocket Enterprise. Five additional library cards are clearly marked visual concepts. Sidequest is an independent prototype, not a Twitch product or browser extension.
 
-Directory cards and sidebar counts are explicitly dated reference previews from the real Twitch homepage, not live API data. Their public image URLs are recorded in `src/lib/twitch-reference.ts`. Selecting a card opens the real official player. Log In, Sign Up, Follow and Subscribe open the corresponding Twitch destination; this app does not collect Twitch credentials or implement Twitch account services. The chat icon opens the official Twitch chat embed.
+## Quick start
 
-## Run locally
-
-Requires Node.js 22.13+ and pnpm 11.25.0 (the package manager version used for this build). This build was verified with Node.js 24.22.1.
+Use Node.js 24 and pnpm 11.25.0. Install pnpm if needed with `npm install --global pnpm@11.25.0`.
 
 ```sh
-pnpm install
+git clone https://github.com/Difajoz/Twitch-Mini-Game.git
+cd Twitch-Mini-Game
+pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open http://127.0.0.1:3000. Select a directory/sidebar channel, or enter a channel in the top search field and press Enter. Click **Mini games**, then **Skyline Sprint** to open the runner in the right sidebar. The embedded player starts on an explicit click. The game starts only after **Let’s run**.
+Open [127.0.0.1:3000](http://127.0.0.1:3000). No API credentials are required for the official player or either game. Search for a Twitch channel name or channel URL and press Enter. Press Play inside Twitch to start the broadcast; offline channels show Twitch's own offline screen.
 
 ```sh
 pnpm test
@@ -24,77 +24,52 @@ pnpm build
 pnpm start
 ```
 
-The committed lockfile fixes dependency versions. On this Codex Windows machine, pnpm is bundled at `C:\Users\User\.cache\codex-runtimes\codex-primary-runtime\dependencies\bin\fallback\pnpm.cmd` if it is not on PATH.
+Type checking generates Next.js route types first, so it also works before the first build. The separate `video/` project is optional and is excluded from the app's TypeScript scope. Root installation does not install its dependencies.
 
-## Controls
+## Play
 
-| Action | Keys |
+**Skyline Sprint:** an original 3D rooftop runner with three lanes, jumps, slides, tokens, obstacles and increasing speed. Press the purple Play button. Use arrows or WASD; Space also jumps. Compact arrow buttons offer pointer/touch input. Escape pauses. Ten collected tokens grant one shield per run. Distance plus 25 points per token determines score; best score saves locally. Music and sound start muted.
+
+**Pocket Enterprise:** steer a coin formation through six arithmetic gates during an approximately 11.3-second run. Use A/D, left/right arrows, the visible gate/steering buttons, or pointer drag. Finish to bank your coins and enter the business street. Walk with WASD/arrows, held direction buttons, or a pointer destination. Walk onto a shop pad to invest; partial payments persist. Leave and re-enter to invest again. Coffee House, Cookie Corner and Burger Club unlock in order and each has two upgrades. Walk onto the gold RUN pad for another run. Wallet and city progress save locally; there is no real-money currency or offline income.
+
+Both games pause when you switch games, close the panel, leave the window, hide the tab, or move focus to the stream. Return and resume explicitly. Closing or switching the panel retains the current run in memory; reloading retains only saved best/city progress. Storage restrictions leave games usable with session-only progress. Web Locks synchronize supported browsers' city transactions across tabs.
+
+**Neon Drift, Orbit Breaker, Pixel Rally, Moon Hopper and Crystal Match** are static visual concepts with no gameplay simulation. The UI and submission description identify them accordingly.
+
+## Watch and layout
+
+The dark surfaces, compact navigation, purple controls, menus and channel presentation follow Twitch's visual style. The right game rail preserves the existing player and game instances. **Watch + play fullscreen** includes stream and games; Twitch's own fullscreen button includes only its player. Phone layouts stack the game panel beneath the stream; desktop is the intended watch-and-play experience.
+
+The official player remains at least 400 × 300 px. Narrow screens get a contained horizontal scroll area. The chat control opens official Twitch chat. Login, signup, follow and subscribe links open Twitch; this app collects no Twitch credentials or payments.
+
+Directory cards and counts are **dated reference previews from October 31, 2026**, not a live directory. Thumbnails are requested from Twitch and may show offline placeholders. Selecting a card opens its actual channel. Without optional API credentials the page says current channel details are unavailable; this does not block playback or games.
+
+## Optional Twitch metadata
+
+Copy `.env.example` to `.env.local`, set `TWITCH_CLIENT_ID` and `TWITCH_CLIENT_SECRET` from your registered Twitch developer app, then restart the server. Credentials and tokens stay on the server; never use a `NEXT_PUBLIC_` prefix or commit `.env.local`.
+
+The `/api/channel?login=channel_name` adapter returns current identity, title, category, live state and viewer count when configured. It uses upstream timeouts, a bounded 60-second cache, request coalescing, a four-channel concurrency limit, hourly token validation and one authentication retry. Missing configuration returns an explicit 503; unknown channels return 404 and invalid input returns 400. Automated tests use simulated API responses; live credentialed API verification is still outstanding.
+
+Deploy as a Next.js Node server over HTTPS. Verify Twitch playback on the actual production/preview hostname; local playback alone does not prove hosted playback. If your host requires an external listener, use `pnpm exec next start --hostname 0.0.0.0 --port 3000`. No hosted demo is configured in this repository.
+
+## Source map
+
+| Area | Files |
 | --- | --- |
-| Change lane | Left/right arrows or A/D |
-| Jump | Up arrow, W, Space |
-| Slide | Down arrow, S |
-| Pause | Escape or pause button |
+| Twitch-style shell, search, menus, fullscreen | `src/components/Companion.tsx`, `src/app/globals.css` |
+| Official player lifecycle and metadata | `src/components/TwitchPlayer.tsx`, `src/lib/twitch-service.ts`, `src/app/api/channel/route.ts` |
+| Retained game library | `src/components/MiniGames.tsx` |
+| Skyline simulation and rendering | `src/game/simulation.ts`, `src/game/renderer.ts`, `src/components/GamePanel.tsx` |
+| Coin run, economy and business street | `src/game/enterprise.ts`, `src/game/enterprise-renderer.ts`, `src/components/EnterpriseGame.tsx` |
+| Regression checks | `tests/` |
+| Optional submission film | `video/` and its README |
 
-Click the game to focus it. Leaving its panel, clicking the Twitch player, hiding the browser tab or leaving the window pauses a running game. Resume explicitly. Closing the panel preserves a paused run. Reopening its game card returns to it. The right sidebar remains beside the stream and preserves the player and runner DOM nodes. On narrower screens the channel navigation collapses to leave room; keyboard required. A player narrower than 400px gets a local horizontal scroll area to retain Twitch’s minimum size.
+Simulation and rendering are separate. Skyline advances at a fixed 120 Hz with swept collision checks; its procedural route tests exercise 64 seeds over 5 km each at maximum speed. Renderers cap pixel ratio, reuse game objects and release GPU resources. Pocket Enterprise settlements are idempotent, purchases cannot overdraw, and saved cities are validated before loading.
 
-Game sound starts muted. The speaker toggles quiet original synthesized token and collision cues. Speed streaks, the wireframe shield effect, camera tracking, and character banking have been removed. Best score persists locally when storage is available. There is no wallet, account or saved currency balance in this build; collected tokens add to the current run’s score only.
+## Submission
 
-## Twitch setup
+See [SUBMISSION_REVIEW.md](SUBMISSION_REVIEW.md) for the remaining submission steps and [BUILD_STATUS.md](BUILD_STATUS.md) for current verification. [ASSETS.md](ASSETS.md) records asset provenance. Earlier plans are historical and may describe removed features.
 
-The official interactive player works without API credentials. Its `parent` uses the actual page hostname. No viewer or streamer login is required by this app. Twitch may impose its own playback or content restrictions.
+Codex supported planning, the Twitch-style interface, game simulations and renderers, integration, regression tests and the separate Remotion film. The main implementation chat recorded in the project is `01a19028-1860-7ab2-a176-689914c0ff29`; confirm it is the chat containing most of your implementation before submitting.
 
-For channel identity, title, category, live/offline state and viewer count:
-
-1. Register our own app at the Twitch developer console.
-2. Copy `.env.example` to `.env.local`.
-3. Set `TWITCH_CLIENT_ID` and `TWITCH_CLIENT_SECRET`; restart the server.
-
-These credentials and the app token stay on the server. No `NEXT_PUBLIC_` secrets. Requests use client credentials, a bounded 60-second metadata cache, concurrent request coalescing, upstream timeouts, a four-channel concurrency limit, and one token refresh retry after 401. Existing tokens are revalidated hourly. Missing credentials and failed API calls show an honest unavailable state rather than fabricated live data. The embed and standalone game remain independent.
-
-Deploy as a standard Next.js Node server over HTTPS (for example a compatible Node host). Verify Twitch on the **actual production and preview hostnames**, not just localhost. Use an unobscured official player of at least 400 × 300 px. Credentials belong in the host’s secret environment settings. No deployment is configured in this first local build.
-
-References: [Twitch embed requirements](https://dev.twitch.tv/docs/embed/), [interactive player](https://dev.twitch.tv/docs/embed/video-and-clips/), [app authentication](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/), [API](https://dev.twitch.tv/docs/api/reference/).
-
-## Structure and fairness
-
-- `src/components/Companion.tsx`: shell, stable Twitch player, sidebar launch and app fullscreen.
-- `src/components/MiniGames.tsx`: right game sidebar, game library and static example game scenes.
-- `src/components/TwitchPlayer.tsx`: official player lifecycle, events and channel metadata.
-- `src/app/api/channel/route.ts` and `src/lib/twitch-service.ts`: server-only API adapter.
-- `src/game/simulation.ts`: deterministic 120 Hz simulation, movement, collision, chunks and score.
-- `src/game/renderer.ts`: Three.js geometry, character animation, recycled tiles and obstacle pools.
-- `src/components/GamePanel.tsx`: game host, scoped input, focus/visibility pauses and explicit states.
-
-The opening has 96 meters before the first hazard. Introductions use one hazard lane; later rows use two with a token-guided bypass lane. At maximum speed rows are approximately 0.71 seconds apart, allowing a complete two-lane dodge and a short reaction margin. The fixed-step route tests exercise 64 seeds for 5 km each at maximum speed using actual collision and movement. The generator intentionally uses conservative rows rather than complex sequences at this milestone. Tests also cover jump, slide, gaps, collision, scoring, pausing, frame cadence, parsing and API failure/refresh behavior. Browser play is still necessary to assess feel and readability.
-
-Long frame gaps pause rather than skipping obstacles. Pixel ratio is capped at 1.5, there is no postprocessing or realtime shadow map, GPU geometry/materials are shared, and track tiles and hazard objects are recycled. Render loops, event handlers, resize observers and GPU resources are released on disposal.
-
-See [BUILD_STATUS.md](BUILD_STATUS.md) for verified results and outstanding integration checks, and [ASSETS.md](ASSETS.md) for sources.
-
-## Runner tuning and sound
-
-The runner starts at 54 m/s, rises to 90 m/s, and uses a 96m opening and 64m row spacing. Ten tokens award one shield per run. It absorbs one impact and briefly protects through that obstacle; it resets on a new run. A small text status identifies shield availability. The wireframe aura, speed streaks and motion toggle have been removed.
-
-Enable the speaker for original quiet synthesized music and game effects. Music runs only during active gameplay, stops on pause/close/mute, and defaults muted. No external music samples are used. The current suite has 21 passing tests, including shield consumption and maximum-speed route tests.
-
-## Mini games and fullscreen
-
-The normal game rail takes 35% of the content area (up from 28%, a 25% increase), with a 287.5px desktop minimum. App fullscreen reserves 37.5% for the rail (up from 30%). The selected game and the game library each occupy half the sidebar below its header. Opening the library does not replace the homepage, and changing streams does not close the game.
-
-Use **Stream + games fullscreen** immediately below the video, or **Watch + play fullscreen** above it, to fullscreen the entire app. Twitch's fullscreen control belongs to its cross-origin player and fullscreens only that player; it cannot include app content outside the embed.
-
-Skyline Sprint and Pocket Enterprise are playable. Neon Drift, Orbit Breaker, Pixel Rally, Moon Hopper, and Crystal Match are static presentation examples with in-game scenes, HUDs and control hints. They can be selected in the library but intentionally have no gameplay simulation. Their visual treatment has no Coming soon or Preview only labels, as requested for the demo.
-
-## Pocket Enterprise
-
-Choose Mini games → Pocket Enterprise. Start an approximately 11.3-second coin run and choose arithmetic gates with A/D, left/right arrows, the visible steering buttons, or pointer drag in the game. Blue gates add/multiply; red gates subtract/divide. A new run begins with 20 free coins. Finish to bank the remaining coins plus a small shop-order bonus. Reaching zero ends the run without spending your saved wallet.
-
-Finish a run to enter the business street automatically. Move with WASD/arrows, the arrow controls, or click/drag toward a ground location. Walk onto a shop pad to invest automatically; partial funding saves and the pad shows the remaining cost. Leave and return to invest again. Open Coffee House (250), Cookie Corner (750), then Burger Club (1,800), each with two upgrade tiers. Walk onto the gold RUN pad to start another run; the street stays inaccessible until that run finishes. Shop order bonuses are capped at 25% of the completed run's coins, so running stays the main source of earnings. There is no offline income or real-money currency.
-
-Coins spread into new formation slots, tumble off the track on losses, stack onto the businessman's hand at the finish, and stream from the hand to the selected business during purchases. Large values use representative visual coins while numeric balances remain exact. Purchases take approximately 0.8 seconds and can be left immediately; accounting does not depend on finishing an animation. The game is silent by design and honors reduced-motion preferences.
-
-Wallet and shop levels save in browser local storage separately from Skyline's best score. Modern browsers synchronize transactions through Web Locks. Storage failures show a session-only notice; unsupported Web Locks show a single-tab warning. In-progress runs stay in memory and are not recovered after reloading. Clicking the stream, leaving the tab, closing the rail or switching games pauses a running game and stops walking; resume explicitly. Shop menus, mode tabs and explanatory overlays have been removed in favor of physical pads, numbers and icons. Coins and gate choices are enlarged.
-
-Pocket Enterprise runs and businessman walking now move at 3× their original speeds. The business street is expanded to a 26×28 ground with wider shop spacing and a following camera. Runner coins spin sideways; hand stacks remain flat.
-
-Collision audit: Skyline uses swept body checks against visible obstacles and arch posts. A shield absorbs only the struck obstacle. The businessman collides with built shop bodies, counters and upgrade tables; empty plots remain walkable. Coin gate selection samples the lane at the crossing instant.
+References: [Twitch embeds](https://dev.twitch.tv/docs/embed/), [interactive player requirements](https://dev.twitch.tv/docs/embed/video-and-clips/), [Twitch authentication](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/).

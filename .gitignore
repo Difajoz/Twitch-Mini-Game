@@ -6,3 +6,22 @@ out/
 !.env.example
 *.tsbuildinfo
 .qa/
+# Local handoff notes and raw captures are not submission assets.
+NEXT_CHAT_CONTEXT.md
+video/public/capture/codex-app.png
+video/public/capture/codex-idea.png
+video/public/capture/codex-plan.png
+video/public/capture/codex-code.png
+video/public/capture/codex-video.png
+# Stock music is licensed for synchronized video, not standalone redistribution.
+video/source-audio/*.mp3
+video/public/score-v8-close-up.wav
+video/public/score-v10-cat-walk.wav
+video/public/score-v11-cat-walk.wav
+# Keep only captures used by the registered submission compositions.
+video/public/capture/*/
+!video/public/capture/clean/
+video/public/capture/clean/*.png
+video/public/capture/live-stardew-skyline.mp4
+video/public/capture/live-imhaliya-skyline.mp4
+video/public/score-v*.wav

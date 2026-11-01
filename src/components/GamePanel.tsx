@@ -29,6 +29,7 @@ export default function GamePanel({ open, best, muted, onBest, onClose, onMute }
       const oscillator = audio.current.createOscillator(), gain = audio.current.createGain();
       oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(frequency, audio.current.currentTime);
       gain.gain.setValueAtTime(.035, audio.current.currentTime); gain.gain.exponentialRampToValueAtTime(.001, audio.current.currentTime + .12);
+      oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
       oscillator.connect(gain); gain.connect(audio.current.destination); oscillator.start(); oscillator.stop(audio.current.currentTime + .12);
     } catch { /* Audio is optional. */ }
   };
@@ -74,7 +75,7 @@ export default function GamePanel({ open, best, muted, onBest, onClose, onMute }
   const state = snapshot.state;
   return <section ref={panel} className="game-panel skyline-minimal" tabIndex={0} aria-label="Skyline Sprint game. Use arrow keys or W A S D. Escape to pause." onKeyDown={keyboard}
     onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) pause(); }}
-    onPointerDown={event => { if (!(event.target instanceof HTMLElement && event.target.closest('button'))) panel.current?.focus(); }}>
+    onPointerDown={event => { if (!(event.target instanceof Element && event.target.closest('button'))) panel.current?.focus(); }}>
     <div className="game-topbar"><div><span className="tiny-dot" /> SKYLINE SPRINT</div><div className="game-tools">
       <button className="icon-button" title={muted ? 'Enable music and game sound' : 'Mute music and game sound'} aria-label={muted ? 'Turn game sound on' : 'Mute game sound'} onClick={toggleSound}>{muted ? <Speaker muted /> : <Speaker />}</button>
       <button className="icon-button" title="Pause game" aria-label="Pause game" disabled={state !== 'running'} onClick={pause}>Ⅱ</button>
@@ -95,6 +96,9 @@ export default function GamePanel({ open, best, muted, onBest, onClose, onMute }
         </div>
       </div>}
       {state === 'ready' && <div className="skyline-keys" aria-label="Left and right to dodge, up to jump, down to slide"><kbd title="Dodge left">←</kbd><kbd title="Dodge right">→</kbd><kbd title="Jump">↑</kbd><kbd title="Slide">↓</kbd></div>}
+      {state === 'running' && <div className="skyline-touch-controls" aria-label="Runner controls">
+        {([['left', '←', 'Dodge left'], ['right', '→', 'Dodge right'], ['jump', '↑', 'Jump'], ['slide', '↓', 'Slide']] as const).map(([action, symbol, label]) => <button key={action} aria-label={label} title={label} onClick={() => { sim.current.input(action); panel.current?.focus(); }}>{symbol}</button>)}
+      </div>}
     </div>
   </section>;
 }

@@ -21,11 +21,11 @@ export default function EnterpriseGame({open}:{open:boolean}) {
     if(navigator.locks)await navigator.locks.request(KEY,update);else {setNotice('This browser cannot synchronize purchases across tabs. Use one game tab.');update();}
   },[publish]);
   const finish=useCallback(async()=>{if(busy.current||run.current.state!=='finish')return;busy.current=true;
-    try{const current=run.current;receiptAt.current=clock.current;await transact(p=>{const receipt=settle(p,current.id,current.coins);setResult({coins:current.coins,bonus:receipt.bonus,total:receipt.total});return receipt.profile;});}catch{setNotice('Could not settle this run. Return to Businesses and try again.');}finally{busy.current=false;}},[transact]);
+    try{const current=run.current;receiptAt.current=clock.current;await transact(p=>{const receipt=settle(p,current.id,current.coins);setResult({coins:current.coins,bonus:receipt.bonus,total:receipt.total});return receipt.profile;});}catch{setNotice('Could not save this run. Retry to collect your coins.');}finally{busy.current=false;}},[transact]);
   const start=useCallback(()=>{if(busy.current)return;walk.current.stop();pay.current=0;setPayment(false);run.current=new EnterpriseRun(profile.current.runs);run.current.start(crypto.randomUUID());setResult(null);view.current='run';setMode('run');panel.current?.focus();setTick(t=>t+1);},[]);
   const buy=useCallback(async(index:number)=>{if(busy.current||pay.current)return;const cost=price(profile.current,index);if(cost===null||profile.current.wallet===0)return;busy.current=true;try{await transact(p=>{const cost=price(p,index)!;payBefore.current=p.wallet;payFraction.current=(p.wallet-Math.min(cost,p.wallet))/p.wallet;return invest(p,index);});payIndex.current=index;pay.current=.8;setPayment(true);}catch{setNotice('Not enough coins');}finally{busy.current=false;}},[transact]);
   useEffect(()=>{
-    if(!host.current)return;let renderer:EnterpriseRenderer;try{renderer=new EnterpriseRenderer(host.current);}catch{setError('3D graphics could not start. Try a browser with hardware acceleration.');return;}
+    if(!host.current)return;let renderer:EnterpriseRenderer;try{renderer=new EnterpriseRenderer(host.current,()=>{pause();setError('The graphics context was interrupted. Reload the page to restore the game.');});}catch{setError('3D graphics could not start. Try a browser with hardware acceleration.');return;}
     rendererRef.current=renderer;let frame=0,last=0,ui=0,settled='',finishedAt=-1;const animate=(now:number)=>{frame=requestAnimationFrame(animate);const dt=last?Math.min((now-last)/1000,.05):0;const gap=last?(now-last)/1000:0;last=now;
       if(!active.current)return;if(gap>.25)run.current.pause();clock.current+=dt;
       if(view.current==='run')run.current.step(dt);else {const zone=walk.current.step(dt,profile.current.levels);if(zone===-1)start();else if(zone!==null&&zone>=0)void buy(zone);}
@@ -50,6 +50,7 @@ export default function EnterpriseGame({open}:{open:boolean}) {
       {state==='running'&&r.row<6&&<div className="enterprise-choice">{r.pair(r.row).map((g,i)=><button key={i} aria-label={`Choose ${gateText(g)}`} onClick={()=>steer(i?1:-1)} className={`${g.op==='+'||g.op==='×'?'gain':'loss'} ${r.lane===(i?1:-1)?'chosen':''}`}>{gateText(g)}</button>)}</div>}
       {(state==='ready'||state==='paused'||state==='over')&&<div className="enterprise-overlay"><button className="enterprise-play" aria-label={state==='paused'?'Resume coin run':'Start coin run'} onClick={state==='paused'?()=>{r.state='running';panel.current?.focus();}:start}>{state==='over'?'↻':'▶'}</button></div>}
       {state==='finish'&&result&&<div className="enterprise-receipt"><strong>+{arriving}</strong></div>}</>}
+      {state==='finish'&&!result&&notice&&<div className="enterprise-overlay"><button className="button primary" onClick={()=>void finish()}>Retry saving run</button></div>}
       {mode==='town'&&<span className="enterprise-walk-hint">WASD / ↑↓←→</span>}
       {error&&<div className="enterprise-overlay" role="alert">{error}</div>}
     </div>

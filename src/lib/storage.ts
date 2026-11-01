@@ -3,8 +3,9 @@ export const defaults: Preferences = { best: 0, side: 'right', muted: true, effe
 const key = 'sidequest:v1';
 export function loadPreferences(): Preferences {
   try {
-    const data = JSON.parse(localStorage.getItem(key) || '{}');
-    return { best: Number.isFinite(data.best) && data.best >= 0 ? Math.floor(data.best) : 0,
+    const parsed = JSON.parse(localStorage.getItem(key) || '{}');
+    const data = parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+    return { best: Number.isSafeInteger(data.best) && data.best >= 0 ? data.best : 0,
       side: data.side === 'left' ? 'left' : 'right',
       // Audio always starts muted, even after an earlier session enabled it.
       muted: true, effects: typeof data.effects === 'boolean' ? data.effects : true };

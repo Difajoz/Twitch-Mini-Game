@@ -1,39 +1,24 @@
-# Submission assessment — October 31, 2026
+# Submission review — November 1, 2026
 
-My assessment: the core prototype is implemented; submission readiness and competitive differentiation remain unfinished. Passing tests is useful evidence, but does not establish a compelling idea, production reliability, or eligibility.
+The app has two working games, an official Twitch player, a Twitch-style dark interface, scoped game input, retained runs, local progress and app fullscreen. Five other cards are explicitly visual concepts. Root setup requires no Twitch API credentials.
 
-## Priorities before submission
+## Remaining submission steps
 
-1. **Describe the actual scope honestly.** Skyline Sprint is playable. Five other cards open static presentation scenes. Presenting those as five functioning games would conflict with the requirement that the project work as depicted. Recommend an unobtrusive concept designation in a judging build, or focusing the video entirely on the runner and explicitly identifying concepts in the description. This is feedback, not an unauthorized UI change.
-2. **Prove the Twitch connection on the judging setup.** Local playback was previously verified, but the latest layout QA did not establish new sustained playback. Production hostname playback is unverified; live metadata credentials are absent. Show a real live stream with the actual runner, and check channel change, blocked playback, offline state and retry. An embed is a real connection, but the theme fit could be stronger when game behavior is independent of Twitch. Acceptance is the organizers' decision.
-3. **Make the project reproducible.** The source has no remote or commits yet at the start of this review. Push it, test a fresh clone, provide exact setup instructions, and ensure judges can access it. A hosted demo is convenient but does not replace the repository.
-4. **Protect the demo's credibility and asset permissions.** Use our own broadcast or permissioned footage. The copied Twitch presentation and third-party marks/remote assets warrant careful review for a public video. The asset record documents sources; it does not grant permission. Prefer stronger Sidequest identity rather than presenting the entire product as Twitch's own UI.
-5. **Do one sustained usability session.** Check laptop frame rate while playing video, repeated restarts, focus pauses, sidebar reopen and fullscreen. The current right rail remains narrow on phones and controls require a keyboard; position this as a desktop prototype. Twitch's own fullscreen isolates the player; the app's Stream + games fullscreen includes the rail. Explain that distinction clearly.
-6. **Reconcile documentation.** README and the newest build status describe the current sidebar; older planning/status passages describe removed standalone and left/right layouts. Consolidate these before final publication so judges know which behavior to expect.
+1. **Prepare the final video and upload it to YouTube.** Show the actual project with a playing Twitch stream and real footage of building with Codex. The current film's workflow cards are labelled illustrations; add genuine build footage rather than treating those cards as evidence. The current timeline is 44.533 seconds, exceeding the earlier personal 40-second target but below the official three-minute guidance. If you still want 40 seconds, shorten the final edit before export.
+2. **Confirm permission for visible broadcast material and music.** The local film uses third-party broadcast captures. The asset record is provenance, not permission. Stock music files remain local; the repository's film preview works silently without them. The actual website uses only original synthesized game audio.
+3. **Provide the repository URL, English project description and correct Codex session ID.** The main implementation chat recorded in this project is `01a19028-1860-7ab2-a176-689914c0ff29`; confirm it is the chat containing most implementation. Confirm judges have repository access, including any necessary private-repository sharing.
+4. **Submit on Devpost and confirm the project says Submitted.** A saved draft is not an entry. The official deadline is November 2, 2026 at 2 PM Pacific, equivalent to November 3 at 3 AM in Tashkent. Aim to finish on November 2 evening locally. The FAQ's UTC conversion is inconsistent; use the official Pacific deadline and the event countdown.
 
-## Fit to the four equally weighted judging criteria
+## Scope to describe accurately
 
-| Criterion | Current evidence | Main weakness / recommended next step |
-| --- | --- | --- |
-| Innovation / Idea | A low-friction solo activity beside a real broadcast. | A runner alongside a stream may feel familiar. Explain the specific viewer need and why the watch/play interaction matters. |
-| Potential Impact | No streamer installation or account authorization; short sessions. | No user evidence yet. Observe a few viewers and ask whether playing helps them stay engaged or distracts them from the stream; report findings without invented retention claims. |
-| Technological Implementation | Real 3D simulation, fixed-step updates, scoped input, retained sessions, 21 passing tests and successful production build. | Live API path and hosted reliability remain unproven. Show concrete Codex decisions and validation. |
-| Design | Purple controls, persistent stream, half-height active game and scrollable selection below. | Static cards look functional; cloned branding dilutes identity; tiny game HUD and narrow-screen usability need review. |
+- Skyline Sprint and Pocket Enterprise are playable. Other library scenes and the film's advertising placement are concepts.
+- Twitch playback/chat are real official embeds. The directory cards are dated reference listings, not a live recommendation feed.
+- Optional server-side metadata is implemented and tested with simulated API responses; live credentials are not configured or verified.
+- No hosted production demo is configured. If you provide one, test playback on its actual HTTPS hostname. Root source and setup instructions support local judging.
+- Scores, wallet and city progress are local to the browser. No account sync, multiplayer, real-money currency, automatic ad detection or live ad monetization is implemented.
 
-These are qualitative judgments, not predictions of judges' scores.
+## Final verification
 
-## What I would add
+Current automated and browser evidence is recorded in BUILD_STATUS.md. Test/build success demonstrates the checked behavior; it does not guarantee every browser, external Twitch stream or judging criterion.
 
-First choose reliability and clarity over more games. After that, the strongest bounded addition would be a **stream break mode**: an explicit viewer-controlled short session intended for a streamer's break, with an easy return to watching. It fits the current solo scope without chat commands or streamer installation. Validate demand before implementing; do not claim an automatic break/ad detector exists.
-
-A real metadata-backed stream selector is another useful improvement because its server-side implementation already exists. Configure and verify it before expanding features. Touch controls, shops, multiplayer, progression systems and additional game simulations are lower priority for this deadline.
-
-## Submission materials still needed
-
-- Accessible runnable repository and verified installation instructions.
-- Accurate feature description and explanation of how Codex was used.
-- Correct implementation session ID.
-- English demo under three minutes, real Twitch footage, actual Codex-building footage, and permissioned material.
-- Final review of deadline, access and continued availability through judging.
-
-Sources checked October 31, 2026: [Official rules](https://twitchcon-codex.devpost.com/rules), [FAQ](https://twitchcon-codex.devpost.com/resources). The four criteria and functionality requirements come from those sources; product assessments and priorities above are my recommendations.
+Rules rechecked November 1, 2026: [official rules](https://twitchcon-codex.devpost.com/rules) and [FAQ](https://twitchcon-codex.devpost.com/resources). The rules request an accessible source repository, description of Codex use, implementation session ID, and a YouTube video showing Twitch functionality and Codex work. The rules specify publicly visible video; the FAQ also permits unlisted. Public follows the stricter wording. Keep the entry available through judging, which ends November 15.

@@ -22,18 +22,32 @@ export default function Companion() {
   const [collapsed, setCollapsed] = useState(false), [menu, setMenu] = useState<'more' | 'user' | null>(null), [chat, setChat] = useState(false), [parent, setParent] = useState('');
   const [view, setView] = useState<'browse' | 'channel'>('browse'), [featureIndex, setFeatureIndex] = useState(0), [expanded, setExpanded] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (!menu) return;
+    const dismiss = (event: PointerEvent) => {
+      if (event.target instanceof Element && !event.target.closest('.menu-anchor')) setMenu(null);
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      shell.current?.querySelector<HTMLButtonElement>('.menu-anchor button[aria-expanded="true"]')?.focus();
+      setMenu(null);
+    };
+    document.addEventListener('pointerdown', dismiss);
+    document.addEventListener('keydown', escape);
+    return () => { document.removeEventListener('pointerdown', dismiss); document.removeEventListener('keydown', escape); };
+  }, [menu]);
   useEffect(() => { setPreferences(loadPreferences()); setLoaded(true); setParent(window.location.hostname); }, []);
   useEffect(() => { if (loaded) savePreferences(preferences); }, [preferences, loaded]);
   const onBest = useCallback((score: number) => setPreferences(p => ({ ...p, best: Math.max(score, p.best) })), []);
   const launch = () => { setChat(false); setOpen(true); };
-  const selectChannel = (login: string) => { setChannel(login); setInput(''); setView('channel'); setInputError(''); };
+  const selectChannel = (login: string) => { setChannel(login); setInput(''); setView('channel'); setInputError(''); setMenu(null); window.scrollTo({ top: 0, behavior: 'instant' }); };
   const watch = (event: React.FormEvent) => {
     event.preventDefault(); const normalized = parseChannel(input);
     if (!normalized) { setInputError('Enter a Twitch channel name or channel URL.'); return; }
     selectChannel(normalized);
   };
   const rotate = (direction: number) => { const next = (featureIndex + direction + featured.length) % featured.length; setFeatureIndex(next); setChannel(featured[next].login); };
-  const browse = () => { setView('browse'); setChat(false); };
+  const browse = () => { setView('browse'); setChat(false); setMenu(null); window.scrollTo({ top: 0, behavior: 'instant' }); };
   return <div ref={shell} className={`app-shell ${fullscreen ? 'watch-fullscreen' : ''} ${collapsed ? 'nav-collapsed' : ''} ${chat ? 'chat-visible' : ''} ${open ? 'games-open' : ''}`}>
     <header className="site-header">
       <div className="nav-start"><button className="twitch-home" onClick={browse} aria-label="Twitch-style home"><TwitchLogo /></button><button className={`browse-link ${view === 'browse' ? 'active' : ''}`} onClick={browse}>Browse</button><div className="menu-anchor"><button className="icon-button" aria-label="More Options" aria-expanded={menu === 'more'} onClick={() => setMenu(menu === 'more' ? null : 'more')}><Icon name="more" /></button>{menu === 'more' && <div className="nav-menu"><h3>GENERAL</h3>{[['About', 'https://www.twitch.tv/p/en/about/'], ['Blog', 'https://blog.twitch.tv/'], ['Developers', 'https://dev.twitch.tv/'], ['Download Apps', 'https://www.twitch.tv/downloads'], ['Help', 'https://help.twitch.tv/'], ['Safety', 'https://safety.twitch.tv/']].map(([name, url]) => <a key={name} href={url} {...external}>{name}<Icon name="external" size={13} /></a>)}<div className="menu-divider" /><button onClick={() => { launch(); setMenu(null); }}>Mini games<Icon name="game" size={16} /></button></div>}</div></div>

@@ -11,7 +11,10 @@ function loadPlayer() {
   if (loading) return loading;
   loading = new Promise<void>((resolve, reject) => {
     const script = document.createElement('script'); script.src = 'https://player.twitch.tv/js/embed/v1.js'; script.async = true;
-    script.onload = () => resolve(); script.onerror = () => { loading = null; script.remove(); reject(new Error('unavailable')); };
+    const fail = () => { clearTimeout(timeout); loading = null; script.remove(); reject(new Error('unavailable')); };
+    const timeout = setTimeout(fail, 15000);
+    script.onload = () => { if (!window.Twitch) { fail(); return; } clearTimeout(timeout); resolve(); };
+    script.onerror = fail;
     document.head.appendChild(script);
   }); return loading;
 }
@@ -33,7 +36,7 @@ export default function TwitchPlayer({ channel, active, compact = false, fullscr
       const initialChannel = latest.current;
       owned = new api(target.current.id, { channel: initialChannel, parent: [window.location.hostname], width: '100%', height: '100%', autoplay: false, muted: false });
       player.current = owned;
-      const listen = (event: string, label: string) => { const callback = () => setStatus(label); owned!.addEventListener(event, callback); subscriptions.push([event, callback]); };
+      const listen = (event: string, label: string) => { const callback = () => { if (!cancelled) setStatus(label); }; owned!.addEventListener(event, callback); subscriptions.push([event, callback]); };
       const onReady = () => { ready.current = true; if (latest.current !== initialChannel) owned?.setChannel(latest.current); if (!visible.current) owned?.pause(); setStatus('Ready · press play in the Twitch player'); };
       owned.addEventListener(api.READY, onReady); subscriptions.push([api.READY, onReady]);
       listen(api.ONLINE, 'Channel online'); listen(api.OFFLINE, 'Channel offline'); listen(api.PLAYBACK_BLOCKED, 'Press play in the Twitch player to start');
@@ -57,7 +60,7 @@ export default function TwitchPlayer({ channel, active, compact = false, fullscr
   return <div className={`twitch-content ${compact ? 'compact-player' : ''}`}>
     <div className="stream-heading"><span className="eyebrow">OFFICIAL TWITCH PLAYER</span><a href={`https://www.twitch.tv/${channel}`} target="_blank" rel="noreferrer">Open on Twitch ↗</a></div>
     <div className="player-overflow"><div className="twitch-player" id="official-twitch-player" ref={target} /></div>
-    <div className="player-status"><span>{status}</span><div><button className="text-button" onClick={() => setAttempt(a => a + 1)}>Retry player</button><button className="text-button stream-fullscreen" onClick={onFullscreen}>{fullscreen ? 'Exit fullscreen' : 'Stream + games fullscreen'} <Icon name="expand" size={14} /></button></div></div>
+    <div className="player-status"><span role="status">{status}</span><div><button className="text-button" onClick={() => setAttempt(a => a + 1)}>Retry player</button><button className="text-button stream-fullscreen" onClick={onFullscreen}>{fullscreen ? 'Exit fullscreen' : 'Stream + games fullscreen'} <Icon name="expand" size={14} /></button></div></div>
     <div className="channel-info"><div className="channel-avatar">{metadata?.avatar || reference?.avatar ? <img src={metadata?.avatar || reference?.avatar} alt="" width="50" height="50" /> : channel.slice(0, 1).toUpperCase()}</div><div className="channel-details"><div className="channel-name"><a href={`https://www.twitch.tv/${channel}`} target="_blank" rel="noreferrer">{metadata?.name || reference?.name || channel}</a> {metadata && <span className={metadata.live ? 'live-badge' : 'offline-badge'}>{metadata.live ? 'LIVE' : 'OFFLINE'}</span>}</div><p>{metadata?.title || message}</p>{(metadata?.category || reference?.category) && <a className="channel-category" href={categoryUrl(metadata?.category || reference?.category || '')} target="_blank" rel="noreferrer">{metadata?.category || reference?.category}{metadata?.viewers !== null && metadata?.viewers !== undefined ? ` · ${metadata.viewers.toLocaleString()} viewers` : ''}</a>}{reference && <div className="tags">{reference.tags.map(tag => <a key={tag} href={`https://www.twitch.tv/directory/all/tags/${encodeURIComponent(tag)}`} target="_blank" rel="noreferrer">{tag}</a>)}</div>}</div><div className="channel-actions"><a className="button primary" href={`https://www.twitch.tv/${channel}`} target="_blank" rel="noreferrer">♡ Follow</a><a className="button secondary" href={`https://www.twitch.tv/subs/${channel}`} target="_blank" rel="noreferrer">☆ Subscribe</a><a className="icon-button" href={`https://www.twitch.tv/${channel}`} target="_blank" rel="noreferrer" aria-label="Open on Twitch"><Icon name="more" size={18} /></a></div></div>
   </div>;
 }

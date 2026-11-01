@@ -46,3 +46,60 @@
 @media(max-width:1100px) and (min-width:601px){.games-open{--sidebar-width:50px}.games-open .sidebar-heading{justify-content:center;padding:0}.games-open .sidebar-heading h2,.games-open .sidebar-channel-copy,.games-open .sidebar-viewers,.games-open .sidebar-info,.games-open .sidebar-app,.games-open .sidebar-source{display:none}.games-open .sidebar-channel{justify-content:center}.mini-game-cover{width:85px;height:70px}.mini-game-card{gap:9px}.mini-game-copy small{display:none}}
 @media(max-width:700px){.app-shell{--games-width:45vw}.mini-games-header{padding:0 8px}.mini-games-header h2{font-size:12px;gap:5px}.mini-game-cover{width:60px;height:60px}.mini-game-card{gap:7px;padding:6px;min-height:76px}.mini-game-copy strong{font-size:11px}.mini-game-copy>span{font-size:9px}.mini-game-copy small,.mini-game-play{display:none}.mini-games-list{padding:0 6px 10px}.active-mini-game{padding:0 5px 5px}.games-open .main-content{padding-left:8px}.games-open .companion-toolbar>div{gap:3px}.mini-games-sidebar .ready-controls,.mini-games-sidebar .game-bottom{display:none}.mini-games-sidebar .overlay-card h2{font-size:22px}.watch-fullscreen{--games-width:37.5vw}}
 .skyline-minimal .game-overlay,.mini-games-sidebar .skyline-minimal .game-overlay.ready{padding:12px;align-items:center;background:#18131f50;backdrop-filter:none}.skyline-minimal .overlay-card{display:flex;flex-direction:column;align-items:center;gap:12px}.skyline-play{height:64px;width:64px;border-radius:50%;background:#9146ff;color:#fff;font-size:28px;line-height:1;box-shadow:0 4px 0 #0003;display:grid;place-items:center}.skyline-play:hover{background:#772ce8;color:#fff}.skyline-restart{font-size:26px;background:#18181b99;width:36px;height:36px;border-radius:50%;color:#ddd}.skyline-score{font-size:36px;text-shadow:0 2px 5px #0008}.skyline-keys{position:absolute;bottom:15px;left:0;right:0;display:flex;gap:6px;justify-content:center;pointer-events:none}.skyline-keys kbd{height:24px;width:26px;background:#18181b88;font-size:15px}.skyline-minimal .shield-status{font-size:22px;line-height:1;color:#e2cbff}
+
+/* Final interface pass: readable controls and contained panels at every size. */
+html{scrollbar-gutter:stable}
+.site-header .button{border-radius:4px}
+.browse-link.active{color:var(--link);box-shadow:inset 0 -2px var(--link)}
+.header-search{max-width:calc(100% - 530px)}
+.header-search:focus-within{border-radius:7px;box-shadow:0 0 0 1px var(--purple)}
+.nav-menu{max-height:calc(100dvh - 70px);overflow-y:auto}
+.nav-menu a:focus-visible,.nav-menu button:focus-visible{outline-offset:-2px;background:#ffffff14}
+.form-error{max-width:calc(100vw - 24px);width:max-content}
+.stream-heading,.player-status{flex-wrap:wrap;row-gap:8px}
+.player-status>span{min-width:0;overflow-wrap:anywhere}
+.player-status>div{flex-wrap:wrap;justify-content:flex-end;margin-left:auto}
+.player-status .text-button{min-height:26px;padding:4px 6px}
+.channel-name{flex-wrap:wrap;overflow-wrap:anywhere}
+.channel-details p{overflow-wrap:anywhere}
+.channel-actions{flex-wrap:wrap}
+.channel-tabs{overflow-x:auto;white-space:nowrap;scrollbar-width:thin}
+.mini-games-sidebar.has-selection{grid-template-rows:48px minmax(310px,1fr) minmax(150px,1fr);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.mini-games-header{background:var(--surface)}
+.mini-game-card:focus-visible{outline-offset:-3px}
+.mini-game-cover{background:#131d35}
+.concept-badge{display:inline-block;margin-left:6px;padding:2px 5px;border-radius:3px;background:#ffffff12;color:var(--muted);font-size:9px;font-weight:500;vertical-align:middle}
+.mini-game-play{transition:background .15s,transform .15s}
+.mini-game-card:hover .mini-game-play{background:var(--purple-hover);transform:translateX(2px)}
+.mini-games-sidebar .game-loading{height:auto;min-height:160px;flex:1;font-size:12px}
+.mini-games-sidebar .game-tools .icon-button{width:28px;height:28px}
+.game-hud,.best-chip,.shield-status{pointer-events:none}
+.skyline-touch-controls{position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:7px}
+.skyline-touch-controls button{display:grid;place-items:center;width:40px;height:34px;border:1px solid #ffffff40;border-radius:5px;background:#18181bcc;color:var(--ink);font-size:22px;line-height:1}
+.skyline-touch-controls button:hover,.skyline-touch-controls button:active{background:var(--purple);color:white}
+@media(max-width:1100px){.header-search{max-width:calc(100% - 480px)}}
+@media(max-width:850px){.header-search{max-width:calc(100% - 340px)}}
+@media(max-width:700px){
+  .app-shell{--sidebar-width:0px}
+  .left-sidebar{display:none}
+  .header-search{max-width:240px}
+  .games-open .main-content{margin-right:0;min-height:0;padding:62px 12px 14px}
+  .games-open .discovery-content,.games-open footer{display:none}
+  .games-open .mini-games-sidebar{position:relative;top:auto;bottom:auto;width:100%;height:740px;height:min(820px,100dvh);min-height:560px;border-left:0;border-top:1px solid var(--line)}
+  .mini-game-cover{width:85px;height:64px}
+  .mini-game-copy strong{font-size:13px}
+  .mini-game-copy>span{font-size:11px}
+  .mini-game-play{display:flex}
+  .mini-games-header{padding:0 14px}
+  .mini-games-header h2{font-size:15px}
+  .active-mini-game{padding:0 10px 10px}
+  .companion-toolbar{gap:6px}
+  .companion-toolbar .button{font-size:10px;padding:0 8px}
+  .watch-fullscreen .main-content{height:45%;margin:0;padding:0}
+  .watch-fullscreen:not(.games-open) .main-content{height:100%}
+  .watch-fullscreen .mini-games-sidebar{position:absolute;top:45%;bottom:0;height:55%;min-height:0}
+  .watch-fullscreen .mini-games-sidebar.has-selection{grid-template-rows:40px minmax(180px,1fr) 100px}
+  .watch-fullscreen .companion-toolbar{height:42px;padding:6px 10px}
+  .watch-fullscreen .mini-games-header{min-height:40px}
+}
+@media(max-width:600px){.header-search{max-width:240px;min-width:0}}

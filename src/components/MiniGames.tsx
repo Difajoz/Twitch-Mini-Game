@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Icon } from './Icons';
 
 const GamePanel = dynamic(() => import('./GamePanel'), { ssr: false, loading: () => <div className="game-loading">Loading Skyline Sprint…</div> });
-const EnterpriseGame = dynamic(() => import('./EnterpriseGame'), { ssr: false });
+const EnterpriseGame = dynamic(() => import('./EnterpriseGame'), { ssr: false, loading: () => <div className="game-loading" role="status">Loading Pocket Enterprise…</div> });
 const games = [
   { id: 'enterprise', name: 'Pocket Enterprise', genre: 'Runner · Tycoon', description: 'Run for coins. Build your little empire.' },
   { id: 'skyline', name: 'Skyline Sprint', genre: '3D Runner', description: 'Dodge, jump, and chase the skyline.' },
@@ -22,29 +22,30 @@ export default function MiniGames({ open, selected, best, muted, onSelect, onBes
   const [runnerMounted, setRunnerMounted] = useState(false);
   const choose = (id: GameId) => { if (id === 'enterprise') setEnterpriseMounted(true); if (id === 'skyline') setRunnerMounted(true); onSelect(id); };
   const game = games.find(game => game.id === selected);
+  const playable = selected === 'skyline' || selected === 'enterprise';
   return <aside id="mini-games-sidebar" className={`mini-games-sidebar ${selected ? 'has-selection' : ''}`} hidden={!open} aria-label="Mini games sidebar">
     <header className="mini-games-header"><h2><Icon name="game" size={19} />Mini games</h2><button className="icon-button" aria-label="Close mini games" onClick={onClose}><Icon name="close" size={18} /></button></header>
     <div className="active-mini-game" hidden={!selected} aria-label="Selected game">
-      <div className="selected-game-heading"><span>NOW PLAYING</span><button className="text-button" onClick={onBack}>All games</button></div>
+      <div className="selected-game-heading"><span>{playable ? 'NOW PLAYING' : 'GAME CONCEPT'}</span><button className="text-button" onClick={onBack}>All games</button></div>
       {/* Keep the real runner mounted and paused when switching games or closing the bar. */}
       <div className="runner-slot" hidden={selected !== 'skyline'}>{runnerMounted && <GamePanel open={open && selected === 'skyline'} best={best} muted={muted} onBest={onBest} onMute={onMute} onClose={onBack} />}</div>
       <div className="runner-slot" hidden={selected !== 'enterprise'}>{enterpriseMounted && <EnterpriseGame open={open && selected === 'enterprise'} />}</div>
-      {selected !== 'skyline' && selected !== 'enterprise' && game && <section className="example-game" aria-label={`${game.name} game`}>
+      {selected !== 'skyline' && selected !== 'enterprise' && game && <section className="example-game" aria-label={`${game.name} visual concept`}>
         <div className="game-topbar"><strong>{game.name}</strong><button className="icon-button" aria-label="Close game" onClick={onBack}>×</button></div>
         <div className="example-game-view"><GameScene game={game.id} /><div className="example-hud"><span>{selected === 'crystal' ? 'MOVES  18' : selected === 'orbit' ? 'LEVEL  03' : selected === 'moon' ? 'ALTITUDE  240 m' : 'LAP  2 / 3'}</span><strong>{selected === 'crystal' ? '2,450' : selected === 'orbit' ? '1,280' : selected === 'moon' ? '860' : '00:42.68'}</strong></div></div>
-        <div className="example-game-controls"><span>{selected === 'crystal' ? 'Match 3 to collect' : selected === 'orbit' ? 'Move to aim' : selected === 'moon' ? '← → Move · Space Jump' : '← → Steer · ↑ Accelerate'}</span><span>♥ ♥ ♥</span></div>
+        <div className="example-game-controls"><span>Visual concept · Gameplay not implemented</span></div>
       </section>}
     </div>
-    <section className="mini-games-library" aria-label="Choose a mini game"><div className="library-heading"><h3>{selected ? 'Switch game' : 'Pick a game'}</h3><span>{games.length} games</span></div><div className="mini-games-list">
-      {games.map(game => <button key={game.id} className={`mini-game-card ${selected === game.id ? 'selected' : ''}`} onClick={() => choose(game.id)} aria-label={`Play ${game.name}`} aria-pressed={selected === game.id}>
-        <span className="mini-game-cover"><GameScene game={game.id} /></span><span className="mini-game-copy"><strong>{game.name}</strong><span>{game.genre}</span><small>{game.id === 'skyline' && best ? `Best: ${best.toLocaleString()}` : game.description}</small></span><span className="mini-game-play"><Icon name="right" size={18} /></span>
+    <section className="mini-games-library" aria-label="Choose a mini game"><div className="library-heading"><h3>{selected ? 'Switch game' : 'Pick a game'}</h3><span>2 playable · 5 concepts</span></div><div className="mini-games-list">
+      {games.map(game => <button key={game.id} className={`mini-game-card ${selected === game.id ? 'selected' : ''}`} onClick={() => choose(game.id)} aria-label={`Open ${game.name}${game.id === 'skyline' || game.id === 'enterprise' ? '' : ' concept'}`} aria-pressed={selected === game.id}>
+        <span className="mini-game-cover"><GameScene game={game.id} /></span><span className="mini-game-copy"><strong>{game.name}{game.id !== 'skyline' && game.id !== 'enterprise' && <span className="concept-badge">Concept</span>}</strong><span>{game.genre}</span><small>{game.id === 'skyline' && best ? `Best: ${best.toLocaleString()}` : game.description}</small></span><span className="mini-game-play"><Icon name="right" size={18} /></span>
       </button>)}
     </div></section>
   </aside>;
 }
 
 // Original static in-game compositions for the five presentation examples.
-// Only Skyline Sprint has a simulation; the examples deliberately have no game logic.
+// Skyline Sprint and Pocket Enterprise are playable; the examples have no game logic.
 function GameScene({ game }: { game: GameId }) {
   const neon = game === 'neon';
   return <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true">

@@ -1,0 +1,4 @@
+import {useCurrentFrame, interpolate} from 'remotion';
+import {Stage,Tag,Heading,Reveal,purple,ease} from './Design';
+import {Engine} from './Engine';
+export const Opening=()=>{const f=useCurrentFrame();return <Stage><div style={{position:'absolute',left:100,top:190,width:1010,zIndex:2}}><Reveal><Tag>A LITTLE SOMETHING ON THE SIDE</Tag><Heading>Your stream.<br/><span style={{color:purple}}>Your side quest.</span></Heading><p style={{fontSize:32,color:'#aaa4b5',marginTop:38}}>Mini games. Right beside the broadcast.</p></Reveal></div><div style={{position:'absolute',right:-70,top:90,width:720,height:870,perspective:1800}}><div style={{height:'100%',borderRadius:30,overflow:'hidden',border:'1px solid #ffffff30',boxShadow:'0 40px 120px #0009',transform:`rotateY(${interpolate(f,[0,119],[-19,-9],ease)}deg) rotateZ(5deg)`,scale:interpolate(f,[0,119],[1.12,1],ease)}}><Engine kind="enterprise"/></div></div></Stage>;};

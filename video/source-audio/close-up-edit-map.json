@@ -1,0 +1,38 @@
+{
+  "title": "Close Up",
+  "artist": "Michael Ramir C.",
+  "mixkitId": 1167,
+  "duration": 28.6,
+  "sourcePlaybackRate": 1,
+  "crossfadeSeconds": 0.15,
+  "cuts": [
+    {
+      "label": "Opening",
+      "at": 0,
+      "end": 8.666666666666666,
+      "source": 0.133,
+      "gain": 1
+    },
+    {
+      "label": "Live project / breakdown",
+      "at": 8.666666666666666,
+      "end": 15.666666666666666,
+      "source": 38.99,
+      "gain": 0.94
+    },
+    {
+      "label": "Codex / full arrangement",
+      "at": 15.666666666666666,
+      "end": 22.6,
+      "source": 48.13,
+      "gain": 1
+    },
+    {
+      "label": "Signature + logo / original ending",
+      "at": 22.6,
+      "end": 28.6,
+      "source": 86.99,
+      "gain": 1
+    }
+  ]
+}

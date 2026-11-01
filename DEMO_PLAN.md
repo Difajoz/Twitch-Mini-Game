@@ -1,5 +1,7 @@
 # Sidequest demo — recording plan
 
+> Superseded October 31, 2026 by [VIDEO_PRODUCTION_PLAN.md](VIDEO_PRODUCTION_PLAN.md). User limit: **40 seconds maximum**. Selected direction: Codex-built motion graphics, free tools first, no human voice needed. This older 2:30 storyboard and its test counts are historical planning only.
+
 Target: 2 minutes 30 seconds. No camera, no recorded human narration. English on-screen captions carry the explanation. Optional synthetic narration can read the same captions later; it is not required for this cut.
 
 ## Storyboard
