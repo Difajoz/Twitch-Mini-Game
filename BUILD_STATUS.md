@@ -22,6 +22,7 @@ Root type checking excludes the optional video project and generates Next.js rou
 
 - 42 automated tests pass. Coverage includes movement/actions, all Skyline hazards and swept edge collisions, shield isolation, fixed-step cadence, 64 seeds × 5 km at maximum speed, all six-gate paths across four coin-run arrangements, settlement idempotency, investment/upgrade accounting, business walls, malformed saves/preferences, channel parsing and simulated API failures/token retry.
 - TypeScript and production Next.js build pass. The optional video project also passes its own TypeScript check and Remotion bundle.
+- A clean isolated Git checkout installed all root dependencies from the frozen lockfile without installing the video toolchain, then passed type generation, TypeScript, all 42 tests and a production build.
 - Browser: official Twitch SDK loaded, NightngaleTV reported offline, ESLCS reported online and playback was started through the official player.
 - Browser: Pocket Enterprise finished a run, banked 155 coins and entered the walking town. Switching games preserved that wallet.
 - Browser: Skyline started and paused at 14 m, retained its paused run across switches, and resumed through its own controls.
